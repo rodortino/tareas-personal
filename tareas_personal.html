@@ -1111,3 +1111,329 @@ window.addEventListener('resize', render);
 </script>
 </body>
 </html>
+    const s = document.createElement('script');
+    s.src = 'https://apis.google.com/js/api.js';
+    s.onload = resolve;
+    document.head.appendChild(s);
+  });
+}
+
+async function signIn() {
+  document.getElementById('login-err').textContent = '';
+  try {
+    await loadGoogleScript();
+    await loadGapiScript();
+    await new Promise(resolve => gapi.load('client', resolve));
+    await gapi.client.init({});
+    await gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest');
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile',
+      callback: async (resp) => {
+        if (resp.error) { document.getElementById('login-err').textContent = 'Error: ' + resp.error; return; }
+        accessToken = resp.access_token;
+        gapi.client.setToken({ access_token: accessToken });
+        await loadUserInfo();
+        await initApp();
+      }
+    });
+    tokenClient.requestAccessToken({ prompt: 'consent' });
+  } catch(e) {
+    document.getElementById('login-err').textContent = 'Error al iniciar sesión: ' + e.message;
+  }
+}
+
+async function loadUserInfo() {
+  try {
+    const res = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    currentUser = await res.json();
+    const avatar = document.getElementById('hdr-avatar');
+    if (currentUser.picture) {
+      avatar.innerHTML = `<img src="${currentUser.picture}" alt="">`;
+    } else {
+      avatar.textContent = (currentUser.name||'?')[0].toUpperCase();
+    }
+  } catch(e) {}
+}
+
+function signOut() {
+  if (!confirm('¿Cerrar sesión?')) return;
+  if (accessToken) google.accounts.oauth2.revoke(accessToken);
+  accessToken = null;
+  driveFileId = null;
+  data = { tasks: [], personas: [] };
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+// ══ INIT ════════════════════════════════════════════════════════
+async function initApp() {
+  showLoading('Cargando tareas...');
+  try {
+    await loadFromDrive();
+    showApp();
+  } catch(e) {
+    showError('Error al cargar: ' + e.message);
+  }
+}
+
+function showLoading(msg) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('loading-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loading-text').textContent = msg;
+}
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+}
+function showError(msg) {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-err').textContent = msg;
+}
+
+// ══ GOOGLE DRIVE ════════════════════════════════════════════════
+async function getOrCreateFolder() {
+  // Buscar carpeta
+  const search = await gapi.client.drive.files.list({
+    q: `name='${DRIVE_FOLDER}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+    fields: 'files(id,name)'
+  });
+  if (search.result.files.length > 0) return search.result.files[0].id;
+  // Crear carpeta
+  const create = await gapi.client.drive.files.create({
+    resource: { name: DRIVE_FOLDER, mimeType: 'application/vnd.google-apps.folder' },
+    fields: 'id'
+  });
+  return create.result.id;
+}
+
+async function loadFromDrive() {
+  setSyncStatus('syncing', 'Sincronizando...');
+  try {
+    const folderId = await getOrCreateFolder();
+    // Buscar archivo
+    const search = await gapi.client.drive.files.list({
+      q: `name='${DRIVE_FILE_NAME}' and '${folderId}' in parents and trashed=false`,
+      fields: 'files(id,name)'
+    });
+    if (search.result.files.length > 0) {
+      driveFileId = search.result.files[0].id;
+      const res = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      data = await res.json();
+      if (!data.tasks) data.tasks = [];
+      if (!data.personas) data.personas = [];
+    } else {
+      // Archivo nuevo
+      data = { tasks: [], personas: [] };
+      driveFileId = null;
+    }
+    setSyncStatus('ok', 'Sincronizado');
+    render();
+  } catch(e) {
+    setSyncStatus('error', 'Error de sincronización');
+    data = { tasks: [], personas: [] };
+    render();
+  }
+}
+
+async function saveToDrive() {
+  setSyncStatus('syncing', 'Guardando...');
+  try {
+    const folderId = await getOrCreateFolder();
+    const content = JSON.stringify(data, null, 2);
+    const blob = new Blob([content], { type: 'application/json' });
+    if (driveFileId) {
+      // Actualizar archivo existente
+      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        body: content
+      });
+    } else {
+      // Crear archivo nuevo
+      const meta = { name: DRIVE_FILE_NAME, parents: [folderId] };
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
+      form.append('file', blob);
+      const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: form
+      });
+      const result = await res.json();
+      driveFileId = result.id;
+    }
+    setSyncStatus('ok', 'Guardado ✓');
+    setTimeout(() => setSyncStatus('ok', 'Sincronizado'), 2000);
+  } catch(e) {
+    setSyncStatus('error', 'Error al guardar — ' + e.message);
+  }
+}
+
+function setSyncStatus(type, msg) {
+  const bar = document.getElementById('sync-bar');
+  bar.className = 'sync-bar ' + type;
+  document.getElementById('sync-text').textContent = msg;
+}
+
+// ══ DATA ════════════════════════════════════════════════════════
+let data = { tasks: [], personas: [] };
+let editId = null;
+let selPrio = 'Alta';
+let selected = new Set();
+let filters = { responsable: '', estado: '', prioridad: '', inicio: '' };
+
+function today() { return new Date().toISOString().split('T')[0]; }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function fmt(d) { if(!d) return '—'; const[y,m,day]=d.split('-'); return `${day}/${m}`; }
+function fmtFull(d) { if(!d) return '—'; const[y,m,day]=d.split('-'); return `${day}/${m}/${y}`; }
+function ds(f) { if(!f) return 'n'; const t=today(); return f<t?'v':f===t?'h':'n'; }
+function initials(name) { return (name||'?').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase(); }
+function avatarColor(name) {
+  const colors=[['#E8F0EC','#2A5C45'],['#E8EFF7','#1A4A7A'],['#FEF3E6','#B7620D'],['#FCECEA','#C0392B'],['#F3E8FF','#6B21A8']];
+  return colors[(name||'').charCodeAt(0)%colors.length];
+}
+
+const N=new Date();
+const DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const MESES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+document.getElementById('hdr-date').textContent=`${DIAS[N.getDay()]} ${N.getDate()} ${MESES[N.getMonth()]} ${N.getFullYear()}`;
+
+// ══ FILTERS ═════════════════════════════════════════════════════
+function sbFilter(key,val,el){ filters[key]=val; el.closest('.fblock').querySelectorAll('.fopt').forEach(o=>o.classList.remove('active')); el.classList.add('active'); render(); }
+function mobFilter(key,val,el){ filters[key]=val; el.closest('.fp-chips').querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); render(); }
+function getFiltered(){
+  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
+  const isMob=window.innerWidth<=768;
+  const desde=isMob?document.getElementById('mob-desde')?.value:document.getElementById('sb-desde')?.value;
+  const hasta=isMob?document.getElementById('mob-hasta')?.value:document.getElementById('sb-hasta')?.value;
+  return data.tasks.filter(t=>{
+    if(q&&!t.titulo.toLowerCase().includes(q)&&!(t.notas||'').toLowerCase().includes(q)) return false;
+    if(filters.responsable&&t.responsable!==filters.responsable) return false;
+    if(filters.prioridad&&t.prioridad!==filters.prioridad) return false;
+    if(filters.estado==='Vencida'){ if(!(t.estado!=='Completada'&&t.limite&&t.limite<today())) return false; }
+    else if(filters.estado&&t.estado!==filters.estado) return false;
+    if(filters.inicio==='iniciada'&&!(t.inicio&&t.inicio<=today())) return false;
+    if(filters.inicio==='no_iniciada'&&!(t.inicio&&t.inicio>today())) return false;
+    if(desde&&t.limite&&t.limite<desde) return false;
+    if(hasta&&t.limite&&t.limite>hasta) return false;
+    return true;
+  });
+}
+
+// ══ RENDER ══════════════════════════════════════════════════════
+function render(){ updateStats(); renderResponsableFilters(); renderGroups(); }
+
+function updateStats(){
+  const t=data.tasks; const tod=today();
+  document.getElementById('cnt-pend').textContent=t.filter(x=>x.estado==='Pendiente').length;
+  document.getElementById('cnt-prog').textContent=t.filter(x=>x.estado==='En progreso').length;
+  document.getElementById('cnt-venc').textContent=t.filter(x=>x.estado!=='Completada'&&x.limite&&x.limite<tod).length;
+  document.getElementById('cnt-comp').textContent=t.filter(x=>x.estado==='Completada').length;
+  document.getElementById('cnt-est-all').textContent=t.length;
+  document.getElementById('cnt-est-pend').textContent=t.filter(x=>x.estado==='Pendiente').length;
+  document.getElementById('cnt-est-prog').textContent=t.filter(x=>x.estado==='En progreso').length;
+  document.getElementById('cnt-est-comp').textContent=t.filter(x=>x.estado==='Completada').length;
+  document.getElementById('cnt-est-venc').textContent=t.filter(x=>x.estado!=='Completada'&&x.limite&&x.limite<tod).length;
+  document.getElementById('cnt-prio-all').textContent=t.length;
+  document.getElementById('cnt-prio-alta').textContent=t.filter(x=>x.prioridad==='Alta').length;
+  document.getElementById('cnt-prio-media').textContent=t.filter(x=>x.prioridad==='Media').length;
+  document.getElementById('cnt-prio-baja').textContent=t.filter(x=>x.prioridad==='Baja').length;
+}
+
+function renderResponsableFilters(){
+  const personas=data.personas;
+  const sbEl=document.getElementById('sb-responsables');
+  if(sbEl){ sbEl.innerHTML=`<div class="fopt ${filters.responsable===''?'active':''}" onclick="sbFilter('responsable','',this)"><span>Todos</span><span class="fcnt">${data.tasks.length}</span></div>`+personas.map(p=>{const cnt=data.tasks.filter(t=>t.responsable===p).length;const[bg,cl]=avatarColor(p);return`<div class="fopt ${filters.responsable===p?'active':''}" onclick="sbFilter('responsable','${p}',this)"><span style="display:flex;align-items:center;gap:6px"><span class="p-avatar" style="background:${bg};color:${cl}">${initials(p)}</span>${p}</span><span class="fcnt">${cnt}</span></div>`;}).join('');}
+  const mobEl=document.getElementById('mob-resp-chips');
+  if(mobEl){ mobEl.innerHTML=`<div class="chip ${filters.responsable===''?'active':''}" onclick="mobFilter('responsable','',this)">Todos</div>`+personas.map(p=>`<div class="chip ${filters.responsable===p?'active':''}" onclick="mobFilter('responsable','${p}',this)">${p}</div>`).join('');}
+}
+
+function renderGroups(){
+  const list=getFiltered(); const wrap=document.getElementById('groups-wrap'); const isMob=window.innerWidth<=768;
+  const grupoMap={};
+  data.tasks.forEach(t=>{ const g=t.grupo||'__sin_grupo__'; const sg=t.subgrupo||'__sin_subgrupo__'; if(!grupoMap[g])grupoMap[g]={}; if(!grupoMap[g][sg])grupoMap[g][sg]=[]; });
+  list.forEach(t=>{ const g=t.grupo||'__sin_grupo__'; const sg=t.subgrupo||'__sin_subgrupo__'; if(!grupoMap[g])grupoMap[g]={}; if(!grupoMap[g][sg])grupoMap[g][sg]=[]; if(!grupoMap[g][sg].find(x=>x.id===t.id))grupoMap[g][sg].push(t); });
+  Object.keys(grupoMap).forEach(g=>Object.keys(grupoMap[g]).forEach(sg=>{ grupoMap[g][sg].sort((a,b)=>{ const p={Alta:0,Media:1,Baja:2}; if(p[a.prioridad]!==p[b.prioridad])return p[a.prioridad]-p[b.prioridad]; if(a.limite&&b.limite)return a.limite.localeCompare(b.limite); if(a.limite)return -1; if(b.limite)return 1; return 0; }); }));
+  let html='';
+  const grupoKeys=Object.keys(grupoMap).sort((a,b)=>a==='__sin_grupo__'?1:b==='__sin_grupo__'?-1:a.localeCompare(b));
+  grupoKeys.forEach(g=>{
+    const gName=g==='__sin_grupo__'?null:g;
+    const totalEnGrupo=list.filter(t=>(t.grupo||'__sin_grupo__')===g).length;
+    const sgKeys=Object.keys(grupoMap[g]).sort((a,b)=>a==='__sin_subgrupo__'?1:b==='__sin_subgrupo__'?-1:a.localeCompare(b));
+    let sgHtml='';
+    sgKeys.forEach(sg=>{
+      const sgName=sg==='__sin_subgrupo__'?null:sg;
+      const sgTasks=grupoMap[g][sg];
+      const colHdr=isMob?`<div class="col-hdr"><span></span><span></span><span>Título / Detalle</span><div style="display:flex;gap:0;justify-content:flex-end"><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px">Inicio</span><span style="min-width:8px"></span><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px">Límite</span></div></div>`:`<div class="col-hdr"><span></span><span></span><span>Título</span><span>Responsable</span><span>Estado</span><span>Prioridad</span><span>F. inicio</span><span>F. límite</span></div>`;
+      const rowsHtml=sgTasks.map(t=>renderRow(t,isMob)).join('');
+      if(sgName){ sgHtml+=`<div class="subgrupo"><div class="sgrp-hdr" onclick="toggleSgrp(this)"><span class="sgrp-arrow">▾</span><span style="font-size:13px">📂</span><span class="sgrp-name">${esc(sgName)}</span><span class="sgrp-cnt">${sgTasks.length}</span></div><div class="sgrp-body">${colHdr}<div>${rowsHtml}</div></div></div>`; }
+      else{ sgHtml+=`<div class="subgrupo" style="border-top:${gName?'1px solid var(--border)':'none'}"><div class="sgrp-body">${colHdr}<div>${rowsHtml}</div></div></div>`; }
+    });
+    if(gName){ html+=`<div class="grupo" data-grupo="${esc(gName)}"><div class="grp-hdr" onclick="toggleGrp(this)"><span class="grp-arrow">▾</span><span style="font-size:15px">📁</span><span class="grp-name">${esc(gName)}</span><span class="grp-cnt">${totalEnGrupo}</span><span class="grp-add desk-only" onclick="event.stopPropagation();addSubgrupo('${esc(gName)}')">+ Subgrupo</span></div><div class="grp-body">${sgHtml}</div></div>`; }
+    else{ html+=`<div class="grupo" style="border-style:dashed"><div class="grp-hdr" onclick="toggleGrp(this)" style="background:transparent"><span class="grp-arrow">▾</span><span style="font-size:15px">📄</span><span class="grp-name" style="color:var(--text3);font-style:italic">Sin grupo</span><span class="grp-cnt">${totalEnGrupo}</span></div><div class="grp-body">${sgHtml}</div></div>`; }
+  });
+  html+=`<div class="add-grupo" onclick="addGrupo()"><span style="font-size:18px">+</span> Nuevo grupo</div>`;
+  wrap.innerHTML=html;
+  restoreCollapsed();
+}
+
+function renderRow(t,isMob){
+  const p=(t.prioridad||'media').toLowerCase(); const done=t.estado==='Completada'; const dsi=ds(t.inicio); const dsl=ds(t.limite); const sel=selected.has(t.id);
+  if(isMob){ return`<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)"><div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div><div class="done-chk ${done?'on':''}" onclick="event.stopPropagation();toggleDone('${t.id}')"></div><div style="min-width:0;padding-right:4px"><div class="ttitle">${esc(t.titulo)}</div><div class="mob-badges"><span class="badge b-${p}">${t.prioridad}</span><span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span>${t.responsable?`<span class="badge" style="background:var(--surface2);color:var(--text2)">${esc(t.responsable)}</span>`:''}</div></div><div class="mob-dates"><div class="mob-date-cell"><span class="mob-date-lbl">inicio</span><span class="mob-date-val ${dsi}">${t.inicio?fmt(t.inicio):'—'}</span></div><span class="mob-date-sep">·</span><div class="mob-date-cell"><span class="mob-date-lbl">límite</span><span class="mob-date-val ${dsl}">${t.limite?(dsl==='v'?'⚠':dsl==='h'?'🔔':'')+fmt(t.limite):'—'}</span></div></div></div>`; }
+  else{ return`<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)" draggable="true" ondragstart="dragStart(event,'${t.id}')" ondragover="dragOver(event)" ondrop="drop(event,'${t.id}')"><div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div><div class="done-chk ${done?'on':''}" onclick="event.stopPropagation();toggleDone('${t.id}')"></div><div class="ttitle">${esc(t.titulo)}</div><div class="tcell">${t.responsable?esc(t.responsable):'—'}</div><div class="tcell"><span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span></div><div class="tcell"><span class="badge b-${p}">${t.prioridad}</span></div><div class="tcell date ${dsi}">${t.inicio?fmtFull(t.inicio):'—'}</div><div class="tcell date ${dsl}">${t.limite?(dsl==='v'?'⚠ ':dsl==='h'?'🔔 ':'')+fmtFull(t.limite):'—'}</div></div>`; }
+}
+
+function esc(s){ return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function toggleGrp(hdr){ const body=hdr.nextElementSibling; const arrow=hdr.querySelector('.grp-arrow'); const open=body.style.display!=='none'; body.style.display=open?'none':'block'; arrow.classList.toggle('closed',!open); saveCollapsed(); }
+function toggleSgrp(hdr){ const body=hdr.nextElementSibling; const arrow=hdr.querySelector('.sgrp-arrow'); const open=body.style.display!=='none'; body.style.display=open?'none':'block'; arrow.classList.toggle('closed',!open); saveCollapsed(); }
+function saveCollapsed(){ const state={}; document.querySelectorAll('.grp-hdr').forEach(h=>{ const name=h.querySelector('.grp-name')?.textContent; state['g_'+name]=h.nextElementSibling.style.display==='none'; }); sessionStorage.setItem('rvc_personal_collapsed',JSON.stringify(state)); }
+function restoreCollapsed(){ try{ const state=JSON.parse(sessionStorage.getItem('rvc_personal_collapsed')||'{}'); document.querySelectorAll('.grp-hdr').forEach(h=>{ const name=h.querySelector('.grp-name')?.textContent; if(state['g_'+name]){ h.nextElementSibling.style.display='none'; h.querySelector('.grp-arrow')?.classList.add('closed'); } }); }catch(e){} }
+
+function toggleRow(row){ const id=row.dataset.id; if(selected.has(id)){ selected.delete(id); row.classList.remove('selected'); row.querySelector('.sel-chk')?.classList.remove('on'); } else{ selected.add(id); row.classList.add('selected'); row.querySelector('.sel-chk')?.classList.add('on'); } updateActionBar(); }
+function toggleSel(id){ const row=document.querySelector(`.trow[data-id="${id}"]`); if(row)toggleRow(row); }
+function toggleDone(id){ const t=data.tasks.find(x=>x.id===id); if(!t)return; t.estado=t.estado==='Completada'?'Pendiente':'Completada'; saveToDrive(); render(); }
+function clearSelection(){ selected.clear(); updateActionBar(); render(); }
+function updateActionBar(){ const bar=document.getElementById('action-bar'); const info=document.getElementById('ab-info'); const editBtn=document.getElementById('abtn-edit'); const n=selected.size; if(!n){ bar.classList.remove('active'); return; } bar.classList.add('active'); info.textContent=n===1?'1 tarea seleccionada':`${n} tareas seleccionadas`; editBtn.style.opacity=n===1?'1':'0.4'; editBtn.style.pointerEvents=n===1?'auto':'none'; }
+function actionEdit(){ if(selected.size!==1)return; const id=[...selected][0]; openModal(data.tasks.find(t=>t.id===id)); }
+function actionStatus(){ if(selected.size)document.getElementById('status-overlay').classList.add('open'); }
+function applyStatus(estado){ selected.forEach(id=>{ const t=data.tasks.find(x=>x.id===id); if(t)t.estado=estado; }); saveToDrive(); clearSelection(); closeStatusModal(); }
+function closeStatusModal(){ document.getElementById('status-overlay').classList.remove('open'); }
+function actionDelete(){ if(!selected.size)return; if(!confirm(`¿Eliminar ${selected.size} tarea(s)?`))return; data.tasks=data.tasks.filter(t=>!selected.has(t.id)); saveToDrive(); clearSelection(); }
+
+function openModal(task){ editId=task?task.id:null; document.getElementById('modal-title').textContent=task?'Editar tarea':'Nueva tarea'; document.getElementById('f-titulo').value=task?.titulo||''; document.getElementById('f-grupo').value=task?.grupo||''; document.getElementById('f-subgrupo').value=task?.subgrupo||''; document.getElementById('f-inicio').value=task?.inicio||''; document.getElementById('f-limite').value=task?.limite||''; document.getElementById('f-estado').value=task?.estado||'Pendiente'; document.getElementById('f-notas').value=task?.notas||''; setPrio(task?.prioridad||'Alta'); const sel=document.getElementById('f-resp'); sel.innerHTML='<option value="">Sin asignar</option>'+data.personas.map(p=>`<option${task?.responsable===p?' selected':''}>${esc(p)}</option>`).join(''); document.getElementById('grupos-list').innerHTML=[...new Set(data.tasks.map(t=>t.grupo).filter(Boolean))].map(g=>`<option value="${esc(g)}">`).join(''); document.getElementById('subgrupos-list').innerHTML=[...new Set(data.tasks.map(t=>t.subgrupo).filter(Boolean))].map(s=>`<option value="${esc(s)}">`).join(''); document.getElementById('overlay').classList.add('open'); setTimeout(()=>document.getElementById('f-titulo').focus(),200); }
+function closeModal(){ document.getElementById('overlay').classList.remove('open'); editId=null; }
+function setPrio(p){ selPrio=p; document.querySelectorAll('.segbtn').forEach(b=>b.classList.remove('sa','sm','sb')); const btns=document.querySelectorAll('.segbtn'); if(p==='Alta')btns[0].classList.add('sa'); else if(p==='Media')btns[1].classList.add('sm'); else btns[2].classList.add('sb'); }
+function saveTask(){ const titulo=document.getElementById('f-titulo').value.trim(); if(!titulo){ document.getElementById('f-titulo').focus(); return; } const t={ id:editId||uid(), titulo, grupo:document.getElementById('f-grupo').value.trim()||null, subgrupo:document.getElementById('f-subgrupo').value.trim()||null, responsable:document.getElementById('f-resp').value||null, inicio:document.getElementById('f-inicio').value||null, limite:document.getElementById('f-limite').value||null, prioridad:selPrio, estado:document.getElementById('f-estado').value, notas:document.getElementById('f-notas').value.trim()||null, creado:editId?(data.tasks.find(x=>x.id===editId)?.creado||today()):today() }; if(editId){ const i=data.tasks.findIndex(x=>x.id===editId); data.tasks[i]=t; } else data.tasks.unshift(t); saveToDrive(); closeModal(); render(); showToast(editId?'Tarea actualizada':'Tarea creada'); }
+
+function addGrupo(){ const name=prompt('Nombre del grupo:'); if(!name?.trim())return; openModal({grupo:name.trim()}); }
+function addSubgrupo(grupo){ const name=prompt(`Nombre del subgrupo en "${grupo}":`); if(!name?.trim())return; openModal({grupo,subgrupo:name.trim()}); }
+
+function openPersonasModal(){ renderPersonasList(); document.getElementById('personas-overlay').classList.add('open'); }
+function closePersonasModal(){ document.getElementById('personas-overlay').classList.remove('open'); }
+function renderPersonasList(){ document.getElementById('personas-list').innerHTML=data.personas.map(p=>`<div class="persona-item"><span style="font-size:14px;font-weight:500">${esc(p)}</span><button class="persona-del" onclick="deletePersona('${esc(p)}')">✕</button></div>`).join('')||'<p style="font-size:13px;color:var(--text3);padding:8px 0">No hay personas agregadas aún.</p>'; }
+function addPersona(){ const val=document.getElementById('nueva-persona').value.trim(); if(!val||data.personas.includes(val))return; data.personas.push(val); document.getElementById('nueva-persona').value=''; renderPersonasList(); saveToDrive(); render(); }
+function deletePersona(name){ if(!confirm(`¿Eliminar a "${name}"?`))return; data.personas=data.personas.filter(p=>p!==name); renderPersonasList(); saveToDrive(); render(); }
+
+function toggleMobFilter(){ const panel=document.getElementById('mob-filter-panel'); const arrow=document.getElementById('mob-filter-arrow'); const open=panel.classList.toggle('open'); arrow.style.transform=open?'rotate(180deg)':''; }
+
+let dragId=null;
+function dragStart(e,id){ dragId=id; e.dataTransfer.effectAllowed='move'; }
+function dragOver(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; }
+function drop(e,targetId){ e.preventDefault(); if(!dragId||dragId===targetId)return; const fromIdx=data.tasks.findIndex(t=>t.id===dragId); const toIdx=data.tasks.findIndex(t=>t.id===targetId); const[moved]=data.tasks.splice(fromIdx,1); moved.grupo=data.tasks[toIdx]?.grupo||null; moved.subgrupo=data.tasks[toIdx]?.subgrupo||null; data.tasks.splice(toIdx,0,moved); dragId=null; saveToDrive(); render(); showToast('Tarea movida'); }
+
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+
+window.addEventListener('resize',render);
+</script>
+</body>
+</html>
