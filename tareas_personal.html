@@ -5,94 +5,75 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tareas Personal">
 <title>Tareas Personal</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
 <style>
 :root{
   --bg:#F5F3EE;--surface:#FFF;--surface2:#F0EDE6;--border:#E2DDD4;
   --text:#1A1714;--text2:#6B6560;--text3:#A09A93;
-  --accent:#2A5C45;--accent-l:#E8F0EC;
+  --accent:#1A4A7A;--accent-l:#E8EFF7;
   --red:#C0392B;--red-l:#FCECEA;
   --amber:#B7620D;--amber-l:#FEF3E6;
-  --blue:#1A4A7A;--blue-l:#E8EFF7;
+  --green:#2A5C45;--green-l:#E8F0EC;
   --touch:48px;--r:10px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{font-size:16px}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
-
-/* LOGIN */
 .login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 24px;background:var(--accent)}
 .login-logo{width:72px;height:72px;background:rgba(255,255,255,.15);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:34px;margin-bottom:24px}
-.login-title{color:#fff;font-size:26px;font-weight:600;margin-bottom:6px;letter-spacing:-.3px}
+.login-title{color:#fff;font-size:26px;font-weight:600;margin-bottom:6px}
 .login-sub{color:rgba(255,255,255,.6);font-size:14px;margin-bottom:40px;text-align:center;line-height:1.5}
-.login-btn{background:#fff;color:var(--accent);border:none;padding:15px 32px;border-radius:12px;font-size:16px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,.15);transition:transform .15s}
+.login-btn{background:#fff;color:var(--accent);border:none;padding:15px 32px;border-radius:12px;font-size:16px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,.15)}
 .login-btn:active{transform:scale(.97)}
 .login-err{color:rgba(255,200,200,.9);font-size:13px;margin-top:16px;text-align:center;max-width:280px;line-height:1.5}
-
-/* LOADING */
 .loading-screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);gap:14px}
 .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-size:13px;color:var(--text3)}
-
-/* APP */
 .app{display:none;flex-direction:column;height:100vh;overflow:hidden}
-
-/* HEADER */
 .hdr{background:var(--accent);padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:200}
 .hdr-left h1{color:#fff;font-size:15px;font-weight:600}
 .hdr-left p{color:rgba(255,255,255,.5);font-size:10px;font-family:'DM Mono',monospace;margin-top:1px}
 .hdr-right{display:flex;align-items:center;gap:8px}
-.hdr-avatar{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.hdr-avatar{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;overflow:hidden}
+.hdr-avatar img{width:100%;height:100%;object-fit:cover}
 .hbtn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:7px 12px;border-radius:7px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;height:32px;white-space:nowrap}
 .hbtn.primary{background:#fff;color:var(--accent);font-weight:600}
-
-/* SYNC BAR */
 .sync-bar{padding:5px 16px;font-size:11px;display:flex;align-items:center;gap:5px;min-height:26px;flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--border);color:var(--text3)}
-.sync-bar.syncing{color:var(--amber)}
-.sync-bar.error{color:var(--red);background:var(--red-l)}
-.sync-bar.ok{color:var(--accent)}
+.sync-bar.syncing{color:var(--amber)}.sync-bar.error{color:var(--red);background:var(--red-l)}.sync-bar.ok{color:var(--green)}
 .sync-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
-
-/* ══ DESKTOP LAYOUT ══ */
 @media(min-width:769px){
   .mob-only{display:none!important}
   .layout{display:flex;flex:1;overflow:hidden;min-height:0}
   .sidebar{width:225px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
   .content{flex:1;overflow-y:auto;min-width:0;display:flex;flex-direction:column}
   .action-bar{padding:8px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;min-height:44px;background:var(--surface);flex-shrink:0;transition:background .2s}
-  .action-bar.active{background:#1e4433}
+  .action-bar.active{background:#0f2d4a}
   .search-bar{padding:10px 20px;flex-shrink:0}
   .groups-wrap{padding:0 20px 60px;flex:1}
   .col-hdr{display:grid;grid-template-columns:28px 22px 1fr 100px 110px 78px 92px 92px;gap:0;padding:6px 12px 6px 26px;background:#F7F5F0;border-bottom:1px solid var(--border)}
   .trow{display:grid;grid-template-columns:28px 22px 1fr 100px 110px 78px 92px 92px;gap:0;padding:8px 12px 8px 26px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
   .trow:hover{background:#FAFAF8}
 }
-
-/* ══ MOBILE LAYOUT ══ */
 @media(max-width:768px){
   .desk-only{display:none!important}
   .layout{display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0}
   .sidebar{display:none}
   .content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
   .action-bar{padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;min-height:44px;background:var(--surface);flex-shrink:0;transition:background .2s}
-  .action-bar.active{background:#1e4433}
+  .action-bar.active{background:#0f2d4a}
   .search-bar{padding:8px 14px;flex-shrink:0}
   .groups-wrap{padding:0 14px 80px;flex:1}
   .col-hdr{display:grid;grid-template-columns:26px 22px 1fr auto;gap:0;padding:6px 12px 6px 22px;background:#F7F5F0;border-bottom:1px solid var(--border)}
   .trow{display:grid;grid-template-columns:26px 22px 1fr auto;gap:0;padding:9px 12px 9px 22px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
   .trow:active{background:#FAFAF8}
-  /* mobile filter toggle */
   .mob-filter-toggle{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-bottom:1px solid var(--border);padding:11px 14px;cursor:pointer;min-height:var(--touch);flex-shrink:0}
   .mob-filter-panel{background:var(--surface);border-bottom:2px solid var(--accent);display:none;flex-shrink:0;overflow-y:auto;max-height:55vh}
   .mob-filter-panel.open{display:block}
   .fp-inner{padding:12px 16px 16px}
-  .fp-section{margin-bottom:14px}
-  .fp-section:last-child{margin-bottom:0}
+  .fp-section{margin-bottom:14px}.fp-section:last-child{margin-bottom:0}
   .fp-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
   .fp-chips{display:flex;gap:6px;flex-wrap:wrap}
   .chip{padding:7px 13px;border-radius:16px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:var(--bg);color:var(--text2);min-height:36px;display:flex;align-items:center;white-space:nowrap}
@@ -100,31 +81,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .fp-dates{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .fp-date-lbl{font-size:11px;color:var(--text3);margin-bottom:4px}
   .fp-date-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:9px 10px;font-size:13px;font-family:'DM Mono',monospace;color:var(--text);outline:none;min-height:40px;-webkit-appearance:none}
+  .fp-date-input:focus{border-color:var(--accent)}
   .fp-clear{text-align:center;font-size:12px;color:var(--text3);padding:6px;cursor:pointer;margin-top:6px}
 }
-
-/* SHARED STYLES */
 .ab-hint{font-size:12px;color:var(--text3);flex:1}
 .ab-info{font-size:13px;font-weight:500;color:rgba(255,255,255,.85);flex:1;display:none}
-.action-bar.active .ab-hint{display:none}
-.action-bar.active .ab-info{display:block}
+.action-bar.active .ab-hint{display:none}.action-bar.active .ab-info{display:block}
 .abtn{display:none;align-items:center;gap:5px;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;height:30px}
 .action-bar.active .abtn{display:flex}
-.abtn-edit{background:rgba(255,255,255,.15);color:#fff}
-.abtn-status{background:rgba(255,255,255,.15);color:#fff}
-.abtn-del{background:rgba(192,57,43,.5);color:#fff}
-.abtn-clear{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);font-size:11px}
+.abtn-edit{background:rgba(255,255,255,.15);color:#fff}.abtn-status{background:rgba(255,255,255,.15);color:#fff}.abtn-del{background:rgba(192,57,43,.5);color:#fff}.abtn-clear{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);font-size:11px}
 .search-wrap{position:relative}
 .search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px;pointer-events:none}
 .search{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px 8px 32px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;color:var(--text)}
 .search:focus{border-color:var(--accent)}
 .col-hdr span{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.trow.selected{background:var(--accent-l)}
-.trow.done{opacity:.4}
+.trow.selected{background:var(--accent-l)}.trow.done{opacity:.4}
 .trow::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
-.trow.alta::before{background:var(--red)}
-.trow.media::before{background:var(--amber)}
-.trow.baja::before{background:var(--accent)}
+.trow.alta::before{background:var(--red)}.trow.media::before{background:var(--amber)}.trow.baja::before{background:var(--green)}
 .sel-chk,.done-chk{width:16px;height:16px;border:1.5px solid var(--border);border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0}
 .sel-chk.on,.done-chk.on{background:var(--accent);border-color:var(--accent)}
 .sel-chk.on::after,.done-chk.on::after{content:'';width:4px;height:8px;border:1.5px solid #fff;border-top:none;border-left:none;transform:rotate(45deg) translateY(-1px);display:block}
@@ -132,26 +105,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .trow.done .ttitle{text-decoration:line-through;color:var(--text3)}
 .tcell{font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:6px}
 .badge{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;display:inline-block}
-.b-alta{background:var(--red-l);color:var(--red)}
-.b-media{background:var(--amber-l);color:var(--amber)}
-.b-baja{background:var(--accent-l);color:var(--accent)}
-.b-pend{background:var(--surface2);color:var(--text2)}
-.b-prog{background:var(--blue-l);color:var(--blue)}
-.b-comp{background:var(--accent-l);color:var(--accent)}
+.b-alta{background:var(--red-l);color:var(--red)}.b-media{background:var(--amber-l);color:var(--amber)}.b-baja{background:var(--green-l);color:var(--green)}
+.b-pend{background:var(--surface2);color:var(--text2)}.b-prog{background:var(--accent-l);color:var(--accent)}.b-comp{background:var(--green-l);color:var(--green)}
 .date{font-family:'DM Mono',monospace;font-size:11px}
-.date.v{color:var(--red);font-weight:600}
-.date.h{color:var(--amber);font-weight:600}
-.date.n{color:var(--text3)}
-/* mobile dates side by side */
+.date.v{color:var(--red);font-weight:600}.date.h{color:var(--amber);font-weight:600}.date.n{color:var(--text3)}
 .mob-dates{display:flex;gap:2px;align-items:center;flex-shrink:0}
 .mob-date-cell{min-width:44px;text-align:center}
 .mob-date-lbl{font-size:8px;color:var(--text3);display:block;text-align:center}
 .mob-date-val{font-family:'DM Mono',monospace;font-size:10px;display:block;text-align:center;color:var(--text3)}
-.mob-date-val.v{color:var(--red);font-weight:600}
-.mob-date-val.h{color:var(--amber);font-weight:600}
+.mob-date-val.v{color:var(--red);font-weight:600}.mob-date-val.h{color:var(--amber);font-weight:600}
 .mob-date-sep{color:var(--border);font-size:10px}
 .mob-badges{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
-/* grupos */
 .grupo{margin-bottom:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
 .grp-hdr{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--surface2);cursor:pointer;user-select:none;transition:background .12s}
 .grp-hdr:hover,.grp-hdr:active{background:#E8E4DC}
@@ -170,9 +134,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .sgrp-cnt{background:var(--surface2);color:var(--text3);font-size:9px;padding:1px 6px;border-radius:8px}
 .add-grupo{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px dashed var(--border);border-radius:var(--r);cursor:pointer;font-size:13px;color:var(--text3);transition:all .15s;margin-top:4px}
 .add-grupo:hover,.add-grupo:active{border-color:var(--accent);color:var(--accent);background:var(--accent-l)}
-/* empty */
-.empty-grp{text-align:center;padding:20px;color:var(--text3);font-size:12px}
-/* sidebar */
 .sb-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:12px 12px 10px;border-bottom:1px solid var(--border)}
 .stat{border-radius:8px;padding:9px 8px;text-align:center}
 .stat-num{font-size:20px;font-weight:600;letter-spacing:-1px;line-height:1}
@@ -193,11 +154,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .sb-manage{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:11px;color:var(--text3);margin-top:5px;border:1px dashed var(--border)}
 .sb-manage:hover{border-color:var(--accent);color:var(--accent)}
 .p-avatar{width:18px;height:18px;border-radius:50%;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-/* FAB mobile */
-.fab{position:fixed;bottom:24px;right:20px;width:56px;height:56px;background:var(--accent);color:#fff;border:none;border-radius:50%;font-size:28px;cursor:pointer;box-shadow:0 4px 16px rgba(42,92,69,.4);display:none;align-items:center;justify-content:center;z-index:150}
+.fab{position:fixed;bottom:24px;right:20px;width:56px;height:56px;background:var(--accent);color:#fff;border:none;border-radius:50%;font-size:28px;cursor:pointer;box-shadow:0 4px 16px rgba(26,74,122,.4);display:none;align-items:center;justify-content:center;z-index:150}
 @media(max-width:768px){.fab{display:flex}}
 .fab:active{transform:scale(.92)}
-/* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:flex-end;justify-content:center}
 .overlay.open{display:flex}
 @media(min-width:769px){.overlay{align-items:center}}
@@ -217,86 +176,59 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .seg{display:grid;grid-template-columns:1fr 1fr 1fr;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;background:var(--bg)}
 .segbtn{padding:11px 6px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;font-family:'DM Sans',sans-serif;color:var(--text2);min-height:44px}
 .segbtn+.segbtn{border-left:1px solid var(--border)}
-.segbtn.sa{background:var(--red-l);color:var(--red)}
-.segbtn.sm{background:var(--amber-l);color:var(--amber)}
-.segbtn.sb{background:var(--accent-l);color:var(--accent)}
+.segbtn.sa{background:var(--red-l);color:var(--red)}.segbtn.sm{background:var(--amber-l);color:var(--amber)}.segbtn.sb{background:var(--green-l);color:var(--green)}
 .modal-btns{display:flex;gap:10px;margin-top:18px}
 @media(max-width:768px){.modal-btns{flex-direction:column;gap:8px}}
 .btn{flex:1;padding:13px;border-radius:12px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;border:none;min-height:44px}
-.btn-p{background:var(--accent);color:#fff}
-.btn-s{background:var(--surface2);color:var(--text2)}
-/* personas modal */
+.btn-p{background:var(--accent);color:#fff}.btn-s{background:var(--surface2);color:var(--text2)}
 .persona-item{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:8px;border:1px solid var(--border);margin-bottom:6px}
 .persona-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:4px 8px;border-radius:5px}
 .persona-del:hover{background:var(--red-l);color:var(--red)}
-/* toast */
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;opacity:0;transition:all .3s;z-index:500;white-space:nowrap;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-/* drag */
-.trow.dragging{opacity:.4;background:var(--accent-l)}
-.drop-zone{border:2px dashed var(--accent);background:var(--accent-l);border-radius:6px;height:36px;display:none;align-items:center;justify-content:center;font-size:11px;color:var(--accent);margin:2px 0}
-.drop-zone.visible{display:flex}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div class="login-screen" id="login-screen">
   <div class="login-logo">🏠</div>
   <div class="login-title">Tareas Personal</div>
-  <div class="login-sub">Inicia sesión con tu cuenta<br>Microsoft de RVC para continuar</div>
-  <button class="login-btn" onclick="signIn()">
-    <svg width="20" height="20" viewBox="0 0 21 21" fill="none"><rect x="1" y="1" width="9" height="9" fill="#F35325"/><rect x="11" y="1" width="9" height="9" fill="#81BC06"/><rect x="1" y="11" width="9" height="9" fill="#05A6F0"/><rect x="11" y="11" width="9" height="9" fill="#FFBA08"/></svg>
-    Iniciar sesión con Microsoft
+  <div class="login-sub">Inicia sesión con tu cuenta<br>Google para continuar</div>
+  <button class="login-btn" id="login-btn" onclick="signIn()">
+    <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+    Iniciar sesión con Google
   </button>
   <div class="login-err" id="login-err"></div>
 </div>
 
-<!-- LOADING -->
 <div class="loading-screen" id="loading-screen">
   <div class="spinner"></div>
   <div class="loading-text" id="loading-text">Cargando...</div>
 </div>
 
-<!-- APP -->
 <div class="app" id="app">
-
-  <!-- HEADER -->
   <div class="hdr">
-    <div class="hdr-left">
-      <h1>Tareas Personal</h1>
-      <p id="hdr-date"></p>
-    </div>
+    <div class="hdr-left"><h1>Tareas Personal</h1><p id="hdr-date"></p></div>
     <div class="hdr-right">
       <button class="hbtn primary desk-only" onclick="openModal()">+ Nueva tarea</button>
-      <button class="hbtn desk-only" onclick="openPersonasModal()" style="font-size:11px">⚙ Equipo</button>
+      <button class="hbtn desk-only" onclick="openPersonasModal()" style="font-size:11px">⚙ Personas</button>
       <div class="hdr-avatar" id="hdr-avatar" onclick="signOut()" title="Cerrar sesión">?</div>
     </div>
   </div>
-
-  <!-- SYNC BAR -->
-  <div class="sync-bar" id="sync-bar">
-    <div class="sync-dot"></div>
-    <span id="sync-text">Listo</span>
-  </div>
-
+  <div class="sync-bar" id="sync-bar"><div class="sync-dot"></div><span id="sync-text">Listo</span></div>
   <div class="layout">
-
-    <!-- SIDEBAR (desktop) -->
     <div class="sidebar desk-only">
       <div class="sb-stats">
         <div class="stat" style="background:var(--surface2)"><div class="stat-num" id="cnt-pend" style="color:var(--text)">0</div><div class="stat-lbl" style="color:var(--text3)">Pendientes</div></div>
-        <div class="stat" style="background:var(--blue-l)"><div class="stat-num" id="cnt-prog" style="color:var(--blue)">0</div><div class="stat-lbl" style="color:var(--blue)">Progreso</div></div>
+        <div class="stat" style="background:var(--accent-l)"><div class="stat-num" id="cnt-prog" style="color:var(--accent)">0</div><div class="stat-lbl" style="color:var(--accent)">Progreso</div></div>
         <div class="stat" style="background:var(--red-l)"><div class="stat-num" id="cnt-venc" style="color:var(--red)">0</div><div class="stat-lbl" style="color:var(--red)">Vencidas</div></div>
-        <div class="stat" style="background:var(--accent-l)"><div class="stat-num" id="cnt-comp" style="color:var(--accent)">0</div><div class="stat-lbl" style="color:var(--accent)">Listas</div></div>
+        <div class="stat" style="background:var(--green-l)"><div class="stat-num" id="cnt-comp" style="color:var(--green)">0</div><div class="stat-lbl" style="color:var(--green)">Listas</div></div>
       </div>
-      <!-- 1. Responsable -->
       <div class="fblock">
         <div class="fblock-title">Responsable</div>
         <div id="sb-responsables"></div>
         <div class="sb-manage" onclick="openPersonasModal()">⚙ Administrar personas</div>
       </div>
-      <!-- 2. Estado -->
       <div class="fblock">
         <div class="fblock-title">Estado</div>
         <div class="fopt active" onclick="sbFilter('estado','',this)"><span>Todos</span><span class="fcnt" id="cnt-est-all">0</span></div>
@@ -305,7 +237,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="fopt" onclick="sbFilter('estado','Completada',this)"><span>✅ Completada</span><span class="fcnt" id="cnt-est-comp">0</span></div>
         <div class="fopt" style="color:var(--red)" onclick="sbFilter('estado','Vencida',this)"><span>⚠ Vencidas</span><span class="fcnt" id="cnt-est-venc">0</span></div>
       </div>
-      <!-- 3. Prioridad -->
       <div class="fblock">
         <div class="fblock-title">Prioridad</div>
         <div class="fopt active" onclick="sbFilter('prioridad','',this)"><span>Todas</span><span class="fcnt" id="cnt-prio-all">0</span></div>
@@ -313,14 +244,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="fopt" onclick="sbFilter('prioridad','Media',this)"><span>🟡 Media</span><span class="fcnt" id="cnt-prio-media">0</span></div>
         <div class="fopt" onclick="sbFilter('prioridad','Baja',this)"><span>🟢 Baja</span><span class="fcnt" id="cnt-prio-baja">0</span></div>
       </div>
-      <!-- 4. Fecha inicio -->
       <div class="fblock">
         <div class="fblock-title">Fecha inicio</div>
         <div class="fopt active" onclick="sbFilter('inicio','',this)"><span>Todas</span></div>
         <div class="fopt" onclick="sbFilter('inicio','iniciada',this)"><span>▶ Ya iniciadas</span></div>
         <div class="fopt" onclick="sbFilter('inicio','no_iniciada',this)"><span>⏳ No iniciadas</span></div>
       </div>
-      <!-- 5. Fecha límite -->
       <div class="fblock">
         <div class="fblock-title">Fecha límite</div>
         <div class="fdate-row"><div class="fdate-lbl">Desde</div><input class="fdate-input" type="date" id="sb-desde" onchange="render()"></div>
@@ -328,11 +257,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <span class="fclear" onclick="document.getElementById('sb-desde').value='';document.getElementById('sb-hasta').value='';render()">✕ Limpiar rango</span>
       </div>
     </div>
-
-    <!-- CONTENT -->
     <div class="content">
-
-      <!-- Mobile: action bar + filter + search -->
       <div class="action-bar" id="action-bar">
         <span class="ab-hint">Selecciona tareas para ver acciones</span>
         <span class="ab-info" id="ab-info"></span>
@@ -341,49 +266,32 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <button class="abtn abtn-del" onclick="actionDelete()">✕ Eliminar</button>
         <button class="abtn abtn-clear" onclick="clearSelection()">✕</button>
       </div>
-
-      <!-- Mobile filter toggle -->
       <div class="mob-filter-toggle mob-only" onclick="toggleMobFilter()">
-        <span style="font-size:14px;font-weight:500;color:var(--text2);display:flex;align-items:center;gap:8px">🔽 Filtros <span id="mob-filter-count" style="display:none;background:var(--accent);color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:600"></span></span>
+        <span style="font-size:14px;font-weight:500;color:var(--text2);display:flex;align-items:center;gap:8px">🔽 Filtros</span>
         <span id="mob-filter-arrow" style="color:var(--text3);font-size:16px;transition:transform .2s">▾</span>
       </div>
-
-      <!-- Mobile filter panel -->
       <div class="mob-filter-panel mob-only" id="mob-filter-panel">
         <div class="fp-inner">
-          <div class="fp-section">
-            <div class="fp-title">Responsable</div>
-            <div class="fp-chips" id="mob-resp-chips"></div>
-          </div>
-          <div class="fp-section">
-            <div class="fp-title">Estado</div>
-            <div class="fp-chips">
-              <div class="chip active" onclick="mobFilter('estado','',this)">Todos</div>
-              <div class="chip" onclick="mobFilter('estado','Pendiente',this)">Pendiente</div>
-              <div class="chip" onclick="mobFilter('estado','En progreso',this)">En progreso</div>
-              <div class="chip" onclick="mobFilter('estado','Completada',this)">Completada</div>
-              <div class="chip" style="border-color:var(--red-l);color:var(--red)" onclick="mobFilter('estado','Vencida',this)">⚠ Vencidas</div>
-            </div>
-          </div>
-          <div class="fp-section">
-            <div class="fp-title">Prioridad</div>
-            <div class="fp-chips">
-              <div class="chip active" onclick="mobFilter('prioridad','',this)">Todas</div>
-              <div class="chip" onclick="mobFilter('prioridad','Alta',this)">🔴 Alta</div>
-              <div class="chip" onclick="mobFilter('prioridad','Media',this)">🟡 Media</div>
-              <div class="chip" onclick="mobFilter('prioridad','Baja',this)">🟢 Baja</div>
-            </div>
-          </div>
-          <div class="fp-section">
-            <div class="fp-title">Fecha inicio</div>
-            <div class="fp-chips">
-              <div class="chip active" onclick="mobFilter('inicio','',this)">Todas</div>
-              <div class="chip" onclick="mobFilter('inicio','iniciada',this)">▶ Ya iniciadas</div>
-              <div class="chip" onclick="mobFilter('inicio','no_iniciada',this)">⏳ No iniciadas</div>
-            </div>
-          </div>
-          <div class="fp-section">
-            <div class="fp-title">Fecha límite</div>
+          <div class="fp-section"><div class="fp-title">Responsable</div><div class="fp-chips" id="mob-resp-chips"></div></div>
+          <div class="fp-section"><div class="fp-title">Estado</div><div class="fp-chips">
+            <div class="chip active" onclick="mobFilter('estado','',this)">Todos</div>
+            <div class="chip" onclick="mobFilter('estado','Pendiente',this)">Pendiente</div>
+            <div class="chip" onclick="mobFilter('estado','En progreso',this)">En progreso</div>
+            <div class="chip" onclick="mobFilter('estado','Completada',this)">Completada</div>
+            <div class="chip" style="border-color:var(--red-l);color:var(--red)" onclick="mobFilter('estado','Vencida',this)">⚠ Vencidas</div>
+          </div></div>
+          <div class="fp-section"><div class="fp-title">Prioridad</div><div class="fp-chips">
+            <div class="chip active" onclick="mobFilter('prioridad','',this)">Todas</div>
+            <div class="chip" onclick="mobFilter('prioridad','Alta',this)">🔴 Alta</div>
+            <div class="chip" onclick="mobFilter('prioridad','Media',this)">🟡 Media</div>
+            <div class="chip" onclick="mobFilter('prioridad','Baja',this)">🟢 Baja</div>
+          </div></div>
+          <div class="fp-section"><div class="fp-title">Fecha inicio</div><div class="fp-chips">
+            <div class="chip active" onclick="mobFilter('inicio','',this)">Todas</div>
+            <div class="chip" onclick="mobFilter('inicio','iniciada',this)">▶ Ya iniciadas</div>
+            <div class="chip" onclick="mobFilter('inicio','no_iniciada',this)">⏳ No iniciadas</div>
+          </div></div>
+          <div class="fp-section"><div class="fp-title">Fecha límite</div>
             <div class="fp-dates">
               <div><div class="fp-date-lbl">Desde</div><input class="fp-date-input" type="date" id="mob-desde" onchange="render()"></div>
               <div><div class="fp-date-lbl">Hasta</div><input class="fp-date-input" type="date" id="mob-hasta" onchange="render()"></div>
@@ -392,754 +300,125 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           </div>
         </div>
       </div>
-
-      <!-- Search -->
-      <div class="search-bar">
-        <div class="search-wrap">
-          <span class="search-icon">🔍</span>
-          <input class="search" type="text" placeholder="Buscar tarea..." id="search-input" oninput="render()">
-        </div>
-      </div>
-
-      <!-- Groups -->
+      <div class="search-bar"><div class="search-wrap"><span class="search-icon">🔍</span><input class="search" type="text" placeholder="Buscar tarea..." id="search-input" oninput="render()"></div></div>
       <div class="groups-wrap" id="groups-wrap"></div>
-
     </div>
   </div>
-
-  <!-- FAB -->
   <button class="fab" onclick="openModal()">+</button>
-
 </div>
 
-<!-- TASK MODAL -->
+<!-- MODAL TAREA -->
 <div class="overlay" id="overlay" onclick="if(event.target.id==='overlay')closeModal()">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-inner">
-      <div class="modal-title" id="modal-title">Nueva tarea</div>
-      <div class="fg"><label class="fl">Título *</label><input class="fi" id="f-titulo" placeholder="¿Qué hay que hacer?"></div>
-      <div class="frow">
-        <div class="fg"><label class="fl">Grupo</label><input class="fi" id="f-grupo" placeholder="Ej: Proyectos" list="grupos-list"><datalist id="grupos-list"></datalist></div>
-        <div class="fg"><label class="fl">Subgrupo</label><input class="fi" id="f-subgrupo" placeholder="Ej: Torre Norte" list="subgrupos-list"><datalist id="subgrupos-list"></datalist></div>
-      </div>
-      <div class="fg"><label class="fl">Responsable</label><select class="fsel" id="f-resp"><option value="">Sin asignar</option></select></div>
-      <div class="frow">
-        <div class="fg"><label class="fl">Fecha inicio</label><input class="fi" type="date" id="f-inicio"></div>
-        <div class="fg"><label class="fl">Fecha límite</label><input class="fi" type="date" id="f-limite"></div>
-      </div>
-      <div class="fg">
-        <label class="fl">Prioridad</label>
-        <div class="seg" id="seg-prio">
-          <button class="segbtn sa" onclick="setPrio('Alta')">🔴 Alta</button>
-          <button class="segbtn" onclick="setPrio('Media')">🟡 Media</button>
-          <button class="segbtn" onclick="setPrio('Baja')">🟢 Baja</button>
-        </div>
-      </div>
-      <div class="fg"><label class="fl">Estado</label><select class="fsel" id="f-estado"><option>Pendiente</option><option>En progreso</option><option>Completada</option></select></div>
-      <div class="fg"><label class="fl">Notas</label><textarea class="fta" id="f-notas" placeholder="Contexto adicional..."></textarea></div>
-      <div class="modal-btns">
-        <button class="btn btn-s" onclick="closeModal()">Cancelar</button>
-        <button class="btn btn-p" onclick="saveTask()">Guardar tarea</button>
+  <div class="modal"><div class="modal-handle"></div><div class="modal-inner">
+    <div class="modal-title" id="modal-title">Nueva tarea</div>
+    <div class="fg"><label class="fl">Título *</label><input class="fi" id="f-titulo" placeholder="¿Qué hay que hacer?"></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Grupo</label><input class="fi" id="f-grupo" placeholder="Ej: Casa" list="grupos-list"><datalist id="grupos-list"></datalist></div>
+      <div class="fg"><label class="fl">Subgrupo</label><input class="fi" id="f-subgrupo" placeholder="Ej: Reparaciones" list="subgrupos-list"><datalist id="subgrupos-list"></datalist></div>
+    </div>
+    <div class="fg"><label class="fl">Responsable</label><select class="fsel" id="f-resp"><option value="">Sin asignar</option></select></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Fecha inicio</label><input class="fi" type="date" id="f-inicio"></div>
+      <div class="fg"><label class="fl">Fecha límite</label><input class="fi" type="date" id="f-limite"></div>
+    </div>
+    <div class="fg"><label class="fl">Prioridad</label>
+      <div class="seg" id="seg-prio">
+        <button class="segbtn sa" onclick="setPrio('Alta')">🔴 Alta</button>
+        <button class="segbtn" onclick="setPrio('Media')">🟡 Media</button>
+        <button class="segbtn" onclick="setPrio('Baja')">🟢 Baja</button>
       </div>
     </div>
-  </div>
+    <div class="fg"><label class="fl">Estado</label><select class="fsel" id="f-estado"><option>Pendiente</option><option>En progreso</option><option>Completada</option></select></div>
+    <div class="fg"><label class="fl">Notas</label><textarea class="fta" id="f-notas" placeholder="Contexto adicional..."></textarea></div>
+    <div class="modal-btns"><button class="btn btn-s" onclick="closeModal()">Cancelar</button><button class="btn btn-p" onclick="saveTask()">Guardar tarea</button></div>
+  </div></div>
 </div>
 
-<!-- STATUS MODAL -->
+<!-- MODAL ESTADO -->
 <div class="overlay" id="status-overlay" onclick="if(event.target.id==='status-overlay')closeStatusModal()">
-  <div class="modal" style="max-height:auto">
-    <div class="modal-handle"></div>
-    <div class="modal-inner">
-      <div class="modal-title">Cambiar estado</div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <button class="btn" style="background:var(--surface2);color:var(--text2);text-align:left;padding:12px 16px" onclick="applyStatus('Pendiente')">⬜ Pendiente</button>
-        <button class="btn" style="background:var(--blue-l);color:var(--blue);text-align:left;padding:12px 16px" onclick="applyStatus('En progreso')">🔵 En progreso</button>
-        <button class="btn" style="background:var(--accent-l);color:var(--accent);text-align:left;padding:12px 16px" onclick="applyStatus('Completada')">✅ Completada</button>
-      </div>
-      <div class="modal-btns" style="margin-top:14px"><button class="btn btn-s" onclick="closeStatusModal()">Cancelar</button></div>
+  <div class="modal"><div class="modal-handle"></div><div class="modal-inner">
+    <div class="modal-title">Cambiar estado</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn" style="background:var(--surface2);color:var(--text2);text-align:left;padding:12px 16px" onclick="applyStatus('Pendiente')">⬜ Pendiente</button>
+      <button class="btn" style="background:var(--accent-l);color:var(--accent);text-align:left;padding:12px 16px" onclick="applyStatus('En progreso')">🔵 En progreso</button>
+      <button class="btn" style="background:var(--green-l);color:var(--green);text-align:left;padding:12px 16px" onclick="applyStatus('Completada')">✅ Completada</button>
     </div>
-  </div>
+    <div class="modal-btns" style="margin-top:14px"><button class="btn btn-s" onclick="closeStatusModal()">Cancelar</button></div>
+  </div></div>
 </div>
 
-<!-- PERSONAS MODAL -->
+<!-- MODAL PERSONAS -->
 <div class="overlay" id="personas-overlay" onclick="if(event.target.id==='personas-overlay')closePersonasModal()">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-inner">
-      <div class="modal-title">Equipo / Personas</div>
-      <div id="personas-list"></div>
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <input class="fi" id="nueva-persona" placeholder="Nombre de la persona" style="flex:1">
-        <button class="btn btn-p" style="flex:0;padding:0 16px;min-height:44px;font-size:13px" onclick="addPersona()">+ Agregar</button>
-      </div>
-      <div class="modal-btns" style="margin-top:14px"><button class="btn btn-s" onclick="closePersonasModal()">Cerrar</button></div>
+  <div class="modal"><div class="modal-handle"></div><div class="modal-inner">
+    <div class="modal-title">Personas</div>
+    <div id="personas-list"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <input class="fi" id="nueva-persona" placeholder="Nombre" style="flex:1">
+      <button class="btn btn-p" style="flex:0;padding:0 16px;min-height:44px;font-size:13px" onclick="addPersona()">+ Agregar</button>
     </div>
-  </div>
+    <div class="modal-btns" style="margin-top:14px"><button class="btn btn-s" onclick="closePersonasModal()">Cerrar</button></div>
+  </div></div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
 // ══ CONFIG ══════════════════════════════════════════════════════
-const CLIENT_ID = 'a6c013a2-9663-4135-b849-b2c5037d11b5';
-const TENANT_ID = 'e4553afa-e547-4aa5-87b3-163113ff166b';
-const ONEDRIVE_PATH = '/RVC/GG/pendientes/tareasPersonal.json';
-const SCOPES = ['User.Read','Files.ReadWrite'];
+const GOOGLE_CLIENT_ID = '274406918832-9818l460lkjih793ks2rspmdge59er9h.apps.googleusercontent.com';
+const DRIVE_FILE_NAME = 'tareasPersonal.json';
+const DRIVE_FOLDER_NAME = 'Tareas Personal';
 
-// ══ MSAL ════════════════════════════════════════════════════════
-const msalConfig = {
-  auth: { clientId: CLIENT_ID, authority: `https://login.microsoftonline.com/${TENANT_ID}`, redirectUri: window.location.href.split('?')[0].split('#')[0] },
-  cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: true }
-};
-const msal = new msal.PublicClientApplication(msalConfig);
-
+// ══ STATE ═══════════════════════════════════════════════════════
 let accessToken = null;
-let currentUser = null;
-
-async function getToken() {
-  const accounts = msal.getAllAccounts();
-  if (!accounts.length) throw new Error('No hay sesión activa');
-  try {
-    const res = await msal.acquireTokenSilent({ scopes: SCOPES, account: accounts[0] });
-    return res.accessToken;
-  } catch(e) {
-    const res = await msal.acquireTokenPopup({ scopes: SCOPES });
-    return res.accessToken;
-  }
-}
-
-async function signIn() {
-  document.getElementById('login-err').textContent = '';
-  try {
-    await msal.handleRedirectPromise();
-    const res = await msal.loginPopup({ scopes: SCOPES });
-    currentUser = res.account;
-    await initApp();
-  } catch(e) {
-    document.getElementById('login-err').textContent = 'Error al iniciar sesión: ' + e.message;
-  }
-}
-
-async function signOut() {
-  if (!confirm('¿Cerrar sesión?')) return;
-  await msal.logoutPopup();
-  location.reload();
-}
-
-// ══ INIT ════════════════════════════════════════════════════════
-async function initApp() {
-  showLoading('Cargando tareas...');
-  try {
-    accessToken = await getToken();
-    const accounts = msal.getAllAccounts();
-    if (accounts.length) {
-      currentUser = accounts[0];
-      const name = currentUser.name || currentUser.username;
-      const initials = name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
-      document.getElementById('hdr-avatar').textContent = initials;
-    }
-    await loadFromOneDrive();
-    showApp();
-  } catch(e) {
-    showError('Error al cargar: ' + e.message);
-  }
-}
-
-function showLoading(msg) {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('loading-screen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('loading-text').textContent = msg || 'Cargando...';
-}
-
-function showApp() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('loading-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-}
-
-function showError(msg) {
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('loading-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-err').textContent = msg;
-}
-
-// ══ ONEDRIVE ════════════════════════════════════════════════════
-async function loadFromOneDrive() {
-  setSyncStatus('syncing', 'Sincronizando...');
-  try {
-    const token = await getToken();
-    const url = `https://graph.microsoft.com/v1.0/me/drive/root:${ONEDRIVE_PATH}:/content`;
-    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-    if (res.status === 404) {
-      // Archivo nuevo
-      data = { tasks: [], personas: [] };
-    } else if (!res.ok) {
-      throw new Error('Error al leer archivo: ' + res.status);
-    } else {
-      data = await res.json();
-      if (!data.tasks) data.tasks = [];
-      if (!data.personas) data.personas = [];
-    }
-    setSyncStatus('ok', 'Sincronizado');
-    render();
-  } catch(e) {
-    setSyncStatus('error', 'Error de sincronización — trabajando sin conexión');
-    render();
-  }
-}
-
-async function saveToOneDrive() {
-  setSyncStatus('syncing', 'Guardando...');
-  try {
-    const token = await getToken();
-    const url = `https://graph.microsoft.com/v1.0/me/drive/root:${ONEDRIVE_PATH}:/content`;
-    const res = await fetch(url, {
-      method: 'PUT',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(data, null, 2)
-    });
-    if (!res.ok) throw new Error('Error al guardar: ' + res.status);
-    setSyncStatus('ok', 'Guardado ✓');
-    setTimeout(() => setSyncStatus('ok', 'Sincronizado'), 2000);
-  } catch(e) {
-    setSyncStatus('error', 'Error al guardar — ' + e.message);
-  }
-}
-
-function setSyncStatus(type, msg) {
-  const bar = document.getElementById('sync-bar');
-  bar.className = 'sync-bar ' + type;
-  document.getElementById('sync-text').textContent = msg;
-}
-
-// ══ DATA ════════════════════════════════════════════════════════
+let driveFileId = null;
+let driveFolderId = null;
 let data = { tasks: [], personas: [] };
 let editId = null;
 let selPrio = 'Alta';
 let selected = new Set();
-let filters = { responsable: '', estado: '', prioridad: '', inicio: '' };
-
-function today() { return new Date().toISOString().split('T')[0]; }
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-function fmt(d) { if(!d) return '—'; const[y,m,day]=d.split('-'); return `${day}/${m}`; }
-function fmtFull(d) { if(!d) return '—'; const[y,m,day]=d.split('-'); return `${day}/${m}/${y}`; }
-function ds(f) { if(!f) return 'n'; const t=today(); return f<t?'v':f===t?'h':'n'; }
-function initials(name) { return (name||'?').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase(); }
-function avatarColor(name) {
-  const colors = [['#E8F0EC','#2A5C45'],['#E8EFF7','#1A4A7A'],['#FEF3E6','#B7620D'],['#FCECEA','#C0392B'],['#F3E8FF','#6B21A8']];
-  const idx = (name||'').charCodeAt(0) % colors.length;
-  return colors[idx];
-}
-
-// ══ FILTERS ═════════════════════════════════════════════════════
-function sbFilter(key, val, el) {
-  filters[key] = val;
-  el.closest('.fblock').querySelectorAll('.fopt').forEach(o => o.classList.remove('active'));
-  el.classList.add('active');
-  render();
-}
-
-function mobFilter(key, val, el) {
-  filters[key] = val;
-  el.closest('.fp-chips').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  render();
-}
-
-function getFiltered() {
-  const q = (document.getElementById('search-input')?.value || '').toLowerCase();
-  const isMob = window.innerWidth <= 768;
-  const desde = isMob ? document.getElementById('mob-desde')?.value : document.getElementById('sb-desde')?.value;
-  const hasta = isMob ? document.getElementById('mob-hasta')?.value : document.getElementById('sb-hasta')?.value;
-  return data.tasks.filter(t => {
-    if (q && !t.titulo.toLowerCase().includes(q) && !(t.notas||'').toLowerCase().includes(q)) return false;
-    if (filters.responsable && t.responsable !== filters.responsable) return false;
-    if (filters.prioridad && t.prioridad !== filters.prioridad) return false;
-    if (filters.estado === 'Vencida') {
-      if (!(t.estado !== 'Completada' && t.limite && t.limite < today())) return false;
-    } else if (filters.estado && t.estado !== filters.estado) return false;
-    if (filters.inicio === 'iniciada' && !(t.inicio && t.inicio <= today())) return false;
-    if (filters.inicio === 'no_iniciada' && !(t.inicio && t.inicio > today())) return false;
-    if (desde && t.limite && t.limite < desde) return false;
-    if (hasta && t.limite && t.limite > hasta) return false;
-    return true;
-  });
-}
-
-// ══ RENDER ══════════════════════════════════════════════════════
-const N = new Date();
-const DIAS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-document.getElementById('hdr-date').textContent = `${DIAS[N.getDay()]} ${N.getDate()} ${MESES[N.getMonth()]} ${N.getFullYear()}`;
-
-function render() {
-  updateStats();
-  renderResponsableFilters();
-  renderGroups();
-}
-
-function updateStats() {
-  const t = data.tasks;
-  const tod = today();
-  document.getElementById('cnt-pend').textContent = t.filter(x=>x.estado==='Pendiente').length;
-  document.getElementById('cnt-prog').textContent = t.filter(x=>x.estado==='En progreso').length;
-  document.getElementById('cnt-venc').textContent = t.filter(x=>x.estado!=='Completada'&&x.limite&&x.limite<tod).length;
-  document.getElementById('cnt-comp').textContent = t.filter(x=>x.estado==='Completada').length;
-  document.getElementById('cnt-est-all').textContent = t.length;
-  document.getElementById('cnt-est-pend').textContent = t.filter(x=>x.estado==='Pendiente').length;
-  document.getElementById('cnt-est-prog').textContent = t.filter(x=>x.estado==='En progreso').length;
-  document.getElementById('cnt-est-comp').textContent = t.filter(x=>x.estado==='Completada').length;
-  document.getElementById('cnt-est-venc').textContent = t.filter(x=>x.estado!=='Completada'&&x.limite&&x.limite<tod).length;
-  document.getElementById('cnt-prio-all').textContent = t.length;
-  document.getElementById('cnt-prio-alta').textContent = t.filter(x=>x.prioridad==='Alta').length;
-  document.getElementById('cnt-prio-media').textContent = t.filter(x=>x.prioridad==='Media').length;
-  document.getElementById('cnt-prio-baja').textContent = t.filter(x=>x.prioridad==='Baja').length;
-}
-
-function renderResponsableFilters() {
-  const personas = data.personas;
-  const isMob = window.innerWidth <= 768;
-  // Desktop sidebar
-  const sbEl = document.getElementById('sb-responsables');
-  if (sbEl) {
-    sbEl.innerHTML = `<div class="fopt ${filters.responsable===''?'active':''}" onclick="sbFilter('responsable','',this)"><span>Todos</span><span class="fcnt">${data.tasks.length}</span></div>` +
-      personas.map(p => {
-        const cnt = data.tasks.filter(t=>t.responsable===p).length;
-        const [bg,cl] = avatarColor(p);
-        return `<div class="fopt ${filters.responsable===p?'active':''}" onclick="sbFilter('responsable','${p}',this)">
-          <span style="display:flex;align-items:center;gap:6px">
-            <span class="p-avatar" style="background:${bg};color:${cl}">${initials(p)}</span>${p}
-          </span>
-          <span class="fcnt">${cnt}</span>
-        </div>`;
-      }).join('');
-  }
-  // Mobile chips
-  const mobEl = document.getElementById('mob-resp-chips');
-  if (mobEl) {
-    mobEl.innerHTML = `<div class="chip ${filters.responsable===''?'active':''}" onclick="mobFilter('responsable','',this)">Todos</div>` +
-      personas.map(p => `<div class="chip ${filters.responsable===p?'active':''}" onclick="mobFilter('responsable','${p}',this)">${p}</div>`).join('');
-  }
-}
-
-function renderGroups() {
-  const list = getFiltered();
-  const wrap = document.getElementById('groups-wrap');
-  const isMob = window.innerWidth <= 768;
-  // Get unique grupos preserving order
-  const grupoMap = {};
-  data.tasks.forEach(t => {
-    const g = t.grupo || '__sin_grupo__';
-    const sg = t.subgrupo || '__sin_subgrupo__';
-    if (!grupoMap[g]) grupoMap[g] = {};
-    if (!grupoMap[g][sg]) grupoMap[g][sg] = [];
-  });
-  // Fill with filtered tasks
-  list.forEach(t => {
-    const g = t.grupo || '__sin_grupo__';
-    const sg = t.subgrupo || '__sin_subgrupo__';
-    if (!grupoMap[g]) grupoMap[g] = {};
-    if (!grupoMap[g][sg]) grupoMap[g][sg] = [];
-    if (!grupoMap[g][sg].find(x=>x.id===t.id)) grupoMap[g][sg].push(t);
-  });
-  // Sort tasks inside each subgroup
-  Object.keys(grupoMap).forEach(g => {
-    Object.keys(grupoMap[g]).forEach(sg => {
-      grupoMap[g][sg].sort((a,b) => {
-        const p={Alta:0,Media:1,Baja:2};
-        if (p[a.prioridad]!==p[b.prioridad]) return p[a.prioridad]-p[b.prioridad];
-        if (a.limite&&b.limite) return a.limite.localeCompare(b.limite);
-        if (a.limite) return -1; if (b.limite) return 1;
-        return 0;
-      });
-    });
-  });
-  let html = '';
-  const grupoKeys = Object.keys(grupoMap);
-  // Main grupos first, sin_grupo last
-  grupoKeys.sort((a,b) => {
-    if (a==='__sin_grupo__') return 1;
-    if (b==='__sin_grupo__') return -1;
-    return a.localeCompare(b);
-  });
-  grupoKeys.forEach(g => {
-    const gName = g === '__sin_grupo__' ? null : g;
-    const totalEnGrupo = list.filter(t=>(t.grupo||'__sin_grupo__')===g).length;
-    const sgKeys = Object.keys(grupoMap[g]);
-    sgKeys.sort((a,b) => a==='__sin_subgrupo__'?1:b==='__sin_subgrupo__'?-1:a.localeCompare(b));
-    let sgHtml = '';
-    sgKeys.forEach(sg => {
-      const sgName = sg === '__sin_subgrupo__' ? null : sg;
-      const sgTasks = grupoMap[g][sg];
-      const colHdr = isMob
-        ? `<div class="col-hdr"><span></span><span></span><span>Título / Detalle</span><div style="display:flex;gap:0;justify-content:flex-end"><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px">Inicio</span><span style="min-width:8px"></span><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px">Límite</span></div></div>`
-        : `<div class="col-hdr"><span></span><span></span><span>Título</span><span>Responsable</span><span>Estado</span><span>Prioridad</span><span>F. inicio</span><span>F. límite</span></div>`;
-      const rowsHtml = sgTasks.map(t => renderRow(t, isMob)).join('');
-      if (sgName) {
-        sgHtml += `<div class="subgrupo">
-          <div class="sgrp-hdr" onclick="toggleSgrp(this)">
-            <span class="sgrp-arrow">▾</span>
-            <span style="font-size:13px">📂</span>
-            <span class="sgrp-name">${esc(sgName)}</span>
-            <span class="sgrp-cnt">${sgTasks.length}</span>
-          </div>
-          <div class="sgrp-body">${colHdr}<div>${rowsHtml}</div></div>
-        </div>`;
-      } else {
-        sgHtml += `<div class="subgrupo" style="border-top:${gName?'1px solid var(--border)':'none'}">
-          <div class="sgrp-body">${colHdr}<div>${rowsHtml}</div></div>
-        </div>`;
-      }
-    });
-    if (gName) {
-      html += `<div class="grupo" data-grupo="${esc(gName)}">
-        <div class="grp-hdr" onclick="toggleGrp(this)">
-          <span class="grp-arrow">▾</span>
-          <span style="font-size:15px">📁</span>
-          <span class="grp-name">${esc(gName)}</span>
-          <span class="grp-cnt">${totalEnGrupo}</span>
-          <span class="grp-add desk-only" onclick="event.stopPropagation();addSubgrupo('${esc(gName)}')">+ Subgrupo</span>
-        </div>
-        <div class="grp-body">${sgHtml}</div>
-      </div>`;
-    } else {
-      html += `<div class="grupo" style="border-style:dashed">
-        <div class="grp-hdr" onclick="toggleGrp(this)" style="background:transparent">
-          <span class="grp-arrow">▾</span>
-          <span style="font-size:15px">📄</span>
-          <span class="grp-name" style="color:var(--text3);font-style:italic">Sin grupo</span>
-          <span class="grp-cnt">${totalEnGrupo}</span>
-        </div>
-        <div class="grp-body">${sgHtml}</div>
-      </div>`;
-    }
-  });
-  html += `<div class="add-grupo" onclick="addGrupo()"><span style="font-size:18px">+</span> Nuevo grupo</div>`;
-  wrap.innerHTML = html;
-  // Restore collapsed state from sessionStorage
-  restoreCollapsed();
-}
-
-function renderRow(t, isMob) {
-  const p = (t.prioridad||'media').toLowerCase();
-  const done = t.estado === 'Completada';
-  const dsi = ds(t.inicio);
-  const dsl = ds(t.limite);
-  const sel = selected.has(t.id);
-  if (isMob) {
-    return `<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)">
-      <div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div>
-      <div class="done-chk ${done?'on':''}" onclick="event.stopPropagation();toggleDone('${t.id}')"></div>
-      <div style="min-width:0;padding-right:4px">
-        <div class="ttitle">${esc(t.titulo)}</div>
-        <div class="mob-badges">
-          <span class="badge b-${p}">${t.prioridad}</span>
-          <span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span>
-          ${t.responsable?`<span class="badge" style="background:var(--surface2);color:var(--text2)">${esc(t.responsable)}</span>`:''}
-        </div>
-      </div>
-      <div class="mob-dates">
-        <div class="mob-date-cell">
-          <span class="mob-date-lbl">inicio</span>
-          <span class="mob-date-val ${dsi}">${t.inicio?fmt(t.inicio):'—'}</span>
-        </div>
-        <span class="mob-date-sep">·</span>
-        <div class="mob-date-cell">
-          <span class="mob-date-lbl">límite</span>
-          <span class="mob-date-val ${dsl}">${t.limite?(dsl==='v'?'⚠':dsl==='h'?'🔔':'')+fmt(t.limite):'—'}</span>
-        </div>
-      </div>
-    </div>`;
-  } else {
-    return `<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)" draggable="true" ondragstart="dragStart(event,'${t.id}')" ondragover="dragOver(event)" ondrop="drop(event,'${t.id}')">
-      <div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div>
-      <div class="done-chk ${done?'on':''}" onclick="event.stopPropagation();toggleDone('${t.id}')"></div>
-      <div class="ttitle">${esc(t.titulo)}</div>
-      <div class="tcell">${t.responsable?esc(t.responsable):'—'}</div>
-      <div class="tcell"><span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span></div>
-      <div class="tcell"><span class="badge b-${p}">${t.prioridad}</span></div>
-      <div class="tcell date ${dsi}">${t.inicio?fmtFull(t.inicio):'—'}</div>
-      <div class="tcell date ${dsl}">${t.limite?(dsl==='v'?'⚠ ':dsl==='h'?'🔔 ':'')+fmtFull(t.limite):'—'}</div>
-    </div>`;
-  }
-}
-
-function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-// ══ TOGGLE GROUPS ═══════════════════════════════════════════════
-function toggleGrp(hdr) {
-  const body = hdr.nextElementSibling;
-  const arrow = hdr.querySelector('.grp-arrow');
-  const open = body.style.display !== 'none';
-  body.style.display = open ? 'none' : 'block';
-  arrow.classList.toggle('closed', !open);
-  saveCollapsed();
-}
-function toggleSgrp(hdr) {
-  const body = hdr.nextElementSibling;
-  const arrow = hdr.querySelector('.sgrp-arrow');
-  const open = body.style.display !== 'none';
-  body.style.display = open ? 'none' : 'block';
-  arrow.classList.toggle('closed', !open);
-  saveCollapsed();
-}
-function saveCollapsed() {
-  const state = {};
-  document.querySelectorAll('.grp-hdr').forEach(h => {
-    const name = h.querySelector('.grp-name')?.textContent;
-    state['g_'+name] = h.nextElementSibling.style.display === 'none';
-  });
-  sessionStorage.setItem('rvc_collapsed', JSON.stringify(state));
-}
-function restoreCollapsed() {
-  try {
-    const state = JSON.parse(sessionStorage.getItem('rvc_collapsed')||'{}');
-    document.querySelectorAll('.grp-hdr').forEach(h => {
-      const name = h.querySelector('.grp-name')?.textContent;
-      if (state['g_'+name]) {
-        h.nextElementSibling.style.display = 'none';
-        h.querySelector('.grp-arrow')?.classList.add('closed');
-      }
-    });
-  } catch(e) {}
-}
-
-// ══ SELECTION ═══════════════════════════════════════════════════
-function toggleRow(row) {
-  const id = row.dataset.id;
-  if (selected.has(id)) { selected.delete(id); row.classList.remove('selected'); row.querySelector('.sel-chk')?.classList.remove('on'); }
-  else { selected.add(id); row.classList.add('selected'); row.querySelector('.sel-chk')?.classList.add('on'); }
-  updateActionBar();
-}
-function toggleSel(id) {
-  const row = document.querySelector(`.trow[data-id="${id}"]`);
-  if (row) toggleRow(row);
-}
-function toggleDone(id) {
-  const t = data.tasks.find(x=>x.id===id);
-  if (!t) return;
-  t.estado = t.estado === 'Completada' ? 'Pendiente' : 'Completada';
-  saveToOneDrive();
-  render();
-}
-function clearSelection() { selected.clear(); updateActionBar(); render(); }
-function updateActionBar() {
-  const bar = document.getElementById('action-bar');
-  const info = document.getElementById('ab-info');
-  const editBtn = document.getElementById('abtn-edit');
-  const n = selected.size;
-  if (!n) { bar.classList.remove('active'); return; }
-  bar.classList.add('active');
-  info.textContent = n===1?'1 tarea seleccionada':`${n} tareas seleccionadas`;
-  editBtn.style.opacity = n===1?'1':'0.4';
-  editBtn.style.pointerEvents = n===1?'auto':'none';
-}
-function actionEdit() {
-  if (selected.size!==1) return;
-  const id = [...selected][0];
-  openModal(data.tasks.find(t=>t.id===id));
-}
-function actionStatus() { if (selected.size) document.getElementById('status-overlay').classList.add('open'); }
-function applyStatus(estado) {
-  selected.forEach(id => { const t=data.tasks.find(x=>x.id===id); if(t) t.estado=estado; });
-  saveToOneDrive();
-  clearSelection();
-  closeStatusModal();
-}
-function closeStatusModal() { document.getElementById('status-overlay').classList.remove('open'); }
-function actionDelete() {
-  if (!selected.size) return;
-  if (!confirm(`¿Eliminar ${selected.size} tarea(s)?`)) return;
-  data.tasks = data.tasks.filter(t=>!selected.has(t.id));
-  saveToOneDrive();
-  clearSelection();
-}
-
-// ══ MODAL TAREA ══════════════════════════════════════════════════
-function openModal(task) {
-  editId = task ? task.id : null;
-  document.getElementById('modal-title').textContent = task ? 'Editar tarea' : 'Nueva tarea';
-  document.getElementById('f-titulo').value = task?.titulo || '';
-  document.getElementById('f-grupo').value = task?.grupo || '';
-  document.getElementById('f-subgrupo').value = task?.subgrupo || '';
-  document.getElementById('f-inicio').value = task?.inicio || '';
-  document.getElementById('f-limite').value = task?.limite || '';
-  document.getElementById('f-estado').value = task?.estado || 'Pendiente';
-  document.getElementById('f-notas').value = task?.notas || '';
-  setPrio(task?.prioridad || 'Alta');
-  // Fill responsables select
-  const sel = document.getElementById('f-resp');
-  sel.innerHTML = '<option value="">Sin asignar</option>' + data.personas.map(p=>`<option${task?.responsable===p?' selected':''}>${esc(p)}</option>`).join('');
-  // Fill datalists
-  const grupos = [...new Set(data.tasks.map(t=>t.grupo).filter(Boolean))];
-  document.getElementById('grupos-list').innerHTML = grupos.map(g=>`<option value="${esc(g)}">`).join('');
-  const subgrupos = [...new Set(data.tasks.map(t=>t.subgrupo).filter(Boolean))];
-  document.getElementById('subgrupos-list').innerHTML = subgrupos.map(s=>`<option value="${esc(s)}">`).join('');
-  document.getElementById('overlay').classList.add('open');
-  setTimeout(()=>document.getElementById('f-titulo').focus(),200);
-}
-function closeModal() { document.getElementById('overlay').classList.remove('open'); editId=null; }
-function setPrio(p) {
-  selPrio = p;
-  document.querySelectorAll('.segbtn').forEach(b=>b.classList.remove('sa','sm','sb'));
-  const btns = document.querySelectorAll('.segbtn');
-  if(p==='Alta') btns[0].classList.add('sa');
-  else if(p==='Media') btns[1].classList.add('sm');
-  else btns[2].classList.add('sb');
-}
-function saveTask() {
-  const titulo = document.getElementById('f-titulo').value.trim();
-  if (!titulo) { document.getElementById('f-titulo').focus(); return; }
-  const t = {
-    id: editId || uid(),
-    titulo,
-    grupo: document.getElementById('f-grupo').value.trim() || null,
-    subgrupo: document.getElementById('f-subgrupo').value.trim() || null,
-    responsable: document.getElementById('f-resp').value || null,
-    inicio: document.getElementById('f-inicio').value || null,
-    limite: document.getElementById('f-limite').value || null,
-    prioridad: selPrio,
-    estado: document.getElementById('f-estado').value,
-    notas: document.getElementById('f-notas').value.trim() || null,
-    creado: editId ? (data.tasks.find(x=>x.id===editId)?.creado || today()) : today()
-  };
-  if (editId) { const i=data.tasks.findIndex(x=>x.id===editId); data.tasks[i]=t; }
-  else data.tasks.unshift(t);
-  saveToOneDrive();
-  closeModal();
-  render();
-  showToast(editId ? 'Tarea actualizada' : 'Tarea creada');
-}
-
-// ══ GRUPOS ══════════════════════════════════════════════════════
-function addGrupo() {
-  const name = prompt('Nombre del grupo:');
-  if (!name?.trim()) return;
-  // Create a placeholder task in the grupo so it appears
-  openModal({ grupo: name.trim() });
-}
-function addSubgrupo(grupo) {
-  const name = prompt(`Nombre del subgrupo en "${grupo}":`);
-  if (!name?.trim()) return;
-  openModal({ grupo, subgrupo: name.trim() });
-}
-
-// ══ PERSONAS ════════════════════════════════════════════════════
-function openPersonasModal() {
-  renderPersonasList();
-  document.getElementById('personas-overlay').classList.add('open');
-}
-function closePersonasModal() { document.getElementById('personas-overlay').classList.remove('open'); }
-function renderPersonasList() {
-  document.getElementById('personas-list').innerHTML = data.personas.map(p => `
-    <div class="persona-item">
-      <span style="font-size:14px;font-weight:500">${esc(p)}</span>
-      <button class="persona-del" onclick="deletePersona('${esc(p)}')" title="Eliminar">✕</button>
-    </div>`).join('') || '<p style="font-size:13px;color:var(--text3);padding:8px 0">No hay personas agregadas aún.</p>';
-}
-function addPersona() {
-  const val = document.getElementById('nueva-persona').value.trim();
-  if (!val || data.personas.includes(val)) return;
-  data.personas.push(val);
-  document.getElementById('nueva-persona').value = '';
-  renderPersonasList();
-  saveToOneDrive();
-  render();
-}
-function deletePersona(name) {
-  if (!confirm(`¿Eliminar a "${name}" del equipo?`)) return;
-  data.personas = data.personas.filter(p=>p!==name);
-  renderPersonasList();
-  saveToOneDrive();
-  render();
-}
-
-// ══ MOBILE FILTERS ══════════════════════════════════════════════
-function toggleMobFilter() {
-  const panel = document.getElementById('mob-filter-panel');
-  const arrow = document.getElementById('mob-filter-arrow');
-  const open = panel.classList.toggle('open');
-  arrow.style.transform = open ? 'rotate(180deg)' : '';
-}
-
-// ══ DRAG & DROP ══════════════════════════════════════════════════
+let filters = { responsable:'', estado:'', prioridad:'', inicio:'' };
 let dragId = null;
-function dragStart(e, id) { dragId = id; e.dataTransfer.effectAllowed = 'move'; }
-function dragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
-function drop(e, targetId) {
-  e.preventDefault();
-  if (!dragId || dragId === targetId) return;
-  const fromIdx = data.tasks.findIndex(t=>t.id===dragId);
-  const toIdx = data.tasks.findIndex(t=>t.id===targetId);
-  const [moved] = data.tasks.splice(fromIdx, 1);
-  // Copy grupo/subgrupo from target
-  moved.grupo = data.tasks[toIdx]?.grupo || null;
-  moved.subgrupo = data.tasks[toIdx]?.subgrupo || null;
-  data.tasks.splice(toIdx, 0, moved);
-  dragId = null;
-  saveToOneDrive();
-  render();
-  showToast('Tarea movida');
-}
 
-// ══ TOAST ═══════════════════════════════════════════════════════
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// ══ RESIZE ══════════════════════════════════════════════════════
-window.addEventListener('resize', render);
-
-// ══ AUTO-LOGIN ══════════════════════════════════════════════════
-(async () => {
-  try {
-    await msal.handleRedirectPromise();
-    const accounts = msal.getAllAccounts();
-    if (accounts.length) {
-      currentUser = accounts[0];
-      await initApp();
-    }
-  } catch(e) { console.error(e); }
-})();
-</script>
-</body>
-</html>
+// ══ GOOGLE SCRIPTS ══════════════════════════════════════════════
+function loadScript(src) {
+  return new Promise(resolve => {
     const s = document.createElement('script');
-    s.src = 'https://apis.google.com/js/api.js';
-    s.onload = resolve;
+    s.src = src; s.onload = resolve;
     document.head.appendChild(s);
   });
 }
 
+// ══ SIGN IN ══════════════════════════════════════════════════════
 async function signIn() {
   document.getElementById('login-err').textContent = '';
+  document.getElementById('login-btn').textContent = 'Conectando...';
   try {
-    await loadGoogleScript();
-    await loadGapiScript();
-    await new Promise(resolve => gapi.load('client', resolve));
-    await gapi.client.init({});
-    await gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest');
-    tokenClient = google.accounts.oauth2.initTokenClient({
+    if (!window.google) await loadScript('https://accounts.google.com/gsi/client');
+    if (!window.gapi) {
+      await loadScript('https://apis.google.com/js/api.js');
+      await new Promise(r => gapi.load('client', r));
+      await gapi.client.init({});
+      await gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest');
+    }
+    const client = google.accounts.oauth2.initTokenClient({
       client_id: GOOGLE_CLIENT_ID,
       scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile',
       callback: async (resp) => {
-        if (resp.error) { document.getElementById('login-err').textContent = 'Error: ' + resp.error; return; }
+        if (resp.error) {
+          document.getElementById('login-err').textContent = 'Error: ' + resp.error;
+          document.getElementById('login-btn').textContent = 'Iniciar sesión con Google';
+          return;
+        }
         accessToken = resp.access_token;
         gapi.client.setToken({ access_token: accessToken });
         await loadUserInfo();
         await initApp();
       }
     });
-    tokenClient.requestAccessToken({ prompt: 'consent' });
+    client.requestAccessToken({ prompt: '' });
   } catch(e) {
-    document.getElementById('login-err').textContent = 'Error al iniciar sesión: ' + e.message;
+    document.getElementById('login-err').textContent = 'Error: ' + e.message;
+    document.getElementById('login-btn').textContent = 'Iniciar sesión con Google';
   }
 }
 
@@ -1148,24 +427,21 @@ async function loadUserInfo() {
     const res = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
-    currentUser = await res.json();
-    const avatar = document.getElementById('hdr-avatar');
-    if (currentUser.picture) {
-      avatar.innerHTML = `<img src="${currentUser.picture}" alt="">`;
-    } else {
-      avatar.textContent = (currentUser.name||'?')[0].toUpperCase();
-    }
+    const user = await res.json();
+    const av = document.getElementById('hdr-avatar');
+    if (user.picture) av.innerHTML = `<img src="${user.picture}" alt="">`;
+    else av.textContent = (user.name||'?')[0].toUpperCase();
   } catch(e) {}
 }
 
 function signOut() {
   if (!confirm('¿Cerrar sesión?')) return;
   if (accessToken) google.accounts.oauth2.revoke(accessToken);
-  accessToken = null;
-  driveFileId = null;
-  data = { tasks: [], personas: [] };
+  accessToken = null; driveFileId = null; driveFolderId = null;
+  data = { tasks:[], personas:[] };
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-btn').innerHTML = `<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Iniciar sesión con Google`;
 }
 
 // ══ INIT ════════════════════════════════════════════════════════
@@ -1175,139 +451,86 @@ async function initApp() {
     await loadFromDrive();
     showApp();
   } catch(e) {
-    showError('Error al cargar: ' + e.message);
+    showError('Error: ' + e.message);
   }
 }
 
-function showLoading(msg) {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('loading-screen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('loading-text').textContent = msg;
-}
-function showApp() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('loading-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-}
-function showError(msg) {
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('loading-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-err').textContent = msg;
-}
+function showLoading(msg) { document.getElementById('login-screen').style.display='none'; document.getElementById('loading-screen').style.display='flex'; document.getElementById('app').style.display='none'; document.getElementById('loading-text').textContent=msg; }
+function showApp() { document.getElementById('login-screen').style.display='none'; document.getElementById('loading-screen').style.display='none'; document.getElementById('app').style.display='flex'; }
+function showError(msg) { document.getElementById('login-screen').style.display='flex'; document.getElementById('loading-screen').style.display='none'; document.getElementById('app').style.display='none'; document.getElementById('login-err').textContent=msg; document.getElementById('login-btn').textContent='Iniciar sesión con Google'; }
 
-// ══ GOOGLE DRIVE ════════════════════════════════════════════════
+// ══ DRIVE ════════════════════════════════════════════════════════
 async function getOrCreateFolder() {
-  // Buscar carpeta
-  const search = await gapi.client.drive.files.list({
-    q: `name='${DRIVE_FOLDER}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
-    fields: 'files(id,name)'
-  });
-  if (search.result.files.length > 0) return search.result.files[0].id;
-  // Crear carpeta
-  const create = await gapi.client.drive.files.create({
-    resource: { name: DRIVE_FOLDER, mimeType: 'application/vnd.google-apps.folder' },
-    fields: 'id'
-  });
-  return create.result.id;
+  if (driveFolderId) return driveFolderId;
+  const res = await gapi.client.drive.files.list({ q:`name='${DRIVE_FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`, fields:'files(id)' });
+  if (res.result.files.length > 0) { driveFolderId = res.result.files[0].id; return driveFolderId; }
+  const create = await gapi.client.drive.files.create({ resource:{ name:DRIVE_FOLDER_NAME, mimeType:'application/vnd.google-apps.folder' }, fields:'id' });
+  driveFolderId = create.result.id;
+  return driveFolderId;
 }
 
 async function loadFromDrive() {
-  setSyncStatus('syncing', 'Sincronizando...');
+  setSyncStatus('syncing','Sincronizando...');
   try {
     const folderId = await getOrCreateFolder();
-    // Buscar archivo
-    const search = await gapi.client.drive.files.list({
-      q: `name='${DRIVE_FILE_NAME}' and '${folderId}' in parents and trashed=false`,
-      fields: 'files(id,name)'
-    });
-    if (search.result.files.length > 0) {
-      driveFileId = search.result.files[0].id;
-      const res = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      });
-      data = await res.json();
+    const res = await gapi.client.drive.files.list({ q:`name='${DRIVE_FILE_NAME}' and '${folderId}' in parents and trashed=false`, fields:'files(id)' });
+    if (res.result.files.length > 0) {
+      driveFileId = res.result.files[0].id;
+      const r = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, { headers:{ Authorization:`Bearer ${accessToken}` } });
+      data = await r.json();
       if (!data.tasks) data.tasks = [];
       if (!data.personas) data.personas = [];
     } else {
-      // Archivo nuevo
-      data = { tasks: [], personas: [] };
-      driveFileId = null;
+      data = { tasks:[], personas:[] };
     }
-    setSyncStatus('ok', 'Sincronizado');
+    setSyncStatus('ok','Sincronizado');
     render();
   } catch(e) {
-    setSyncStatus('error', 'Error de sincronización');
-    data = { tasks: [], personas: [] };
+    setSyncStatus('error','Error de sincronización');
+    data = { tasks:[], personas:[] };
     render();
   }
 }
 
 async function saveToDrive() {
-  setSyncStatus('syncing', 'Guardando...');
+  setSyncStatus('syncing','Guardando...');
   try {
     const folderId = await getOrCreateFolder();
     const content = JSON.stringify(data, null, 2);
-    const blob = new Blob([content], { type: 'application/json' });
     if (driveFileId) {
-      // Actualizar archivo existente
-      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
-        method: 'PATCH',
-        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-        body: content
-      });
+      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, { method:'PATCH', headers:{ Authorization:`Bearer ${accessToken}`, 'Content-Type':'application/json' }, body:content });
     } else {
-      // Crear archivo nuevo
-      const meta = { name: DRIVE_FILE_NAME, parents: [folderId] };
       const form = new FormData();
-      form.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
-      form.append('file', blob);
-      const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${accessToken}` },
-        body: form
-      });
-      const result = await res.json();
-      driveFileId = result.id;
+      form.append('metadata', new Blob([JSON.stringify({ name:DRIVE_FILE_NAME, parents:[folderId] })], { type:'application/json' }));
+      form.append('file', new Blob([content], { type:'application/json' }));
+      const r = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', { method:'POST', headers:{ Authorization:`Bearer ${accessToken}` }, body:form });
+      driveFileId = (await r.json()).id;
     }
-    setSyncStatus('ok', 'Guardado ✓');
-    setTimeout(() => setSyncStatus('ok', 'Sincronizado'), 2000);
+    setSyncStatus('ok','Guardado ✓');
+    setTimeout(()=>setSyncStatus('ok','Sincronizado'),2000);
   } catch(e) {
-    setSyncStatus('error', 'Error al guardar — ' + e.message);
+    setSyncStatus('error','Error al guardar');
   }
 }
 
-function setSyncStatus(type, msg) {
-  const bar = document.getElementById('sync-bar');
-  bar.className = 'sync-bar ' + type;
-  document.getElementById('sync-text').textContent = msg;
-}
+function setSyncStatus(type,msg){ const bar=document.getElementById('sync-bar'); bar.className='sync-bar '+type; document.getElementById('sync-text').textContent=msg; }
 
-// ══ DATA ════════════════════════════════════════════════════════
-let data = { tasks: [], personas: [] };
-let editId = null;
-let selPrio = 'Alta';
-let selected = new Set();
-let filters = { responsable: '', estado: '', prioridad: '', inicio: '' };
-
-function today() { return new Date().toISOString().split('T')[0]; }
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-function fmt(d) { if(!d) return '—'; const[y,m,day]=d.split('-'); return `${day}/${m}`; }
-function fmtFull(d) { if(!d) return '—'; const[y,m,day]=d.split('-'); return `${day}/${m}/${y}`; }
-function ds(f) { if(!f) return 'n'; const t=today(); return f<t?'v':f===t?'h':'n'; }
-function initials(name) { return (name||'?').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase(); }
-function avatarColor(name) {
-  const colors=[['#E8F0EC','#2A5C45'],['#E8EFF7','#1A4A7A'],['#FEF3E6','#B7620D'],['#FCECEA','#C0392B'],['#F3E8FF','#6B21A8']];
-  return colors[(name||'').charCodeAt(0)%colors.length];
-}
+// ══ UTILS ════════════════════════════════════════════════════════
+function today(){ return new Date().toISOString().split('T')[0]; }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function fmt(d){ if(!d)return'—'; const[y,m,day]=d.split('-'); return`${day}/${m}`; }
+function fmtFull(d){ if(!d)return'—'; const[y,m,day]=d.split('-'); return`${day}/${m}/${y}`; }
+function ds(f){ if(!f)return'n'; const t=today(); return f<t?'v':f===t?'h':'n'; }
+function initials(n){ return(n||'?').split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase(); }
+function avatarColor(n){ const c=[['#E8F0EC','#2A5C45'],['#E8EFF7','#1A4A7A'],['#FEF3E6','#B7620D'],['#FCECEA','#C0392B'],['#F3E8FF','#6B21A8']]; return c[(n||'').charCodeAt(0)%c.length]; }
+function esc(s){ return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 const N=new Date();
 const DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const MESES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 document.getElementById('hdr-date').textContent=`${DIAS[N.getDay()]} ${N.getDate()} ${MESES[N.getMonth()]} ${N.getFullYear()}`;
 
-// ══ FILTERS ═════════════════════════════════════════════════════
+// ══ FILTERS ══════════════════════════════════════════════════════
 function sbFilter(key,val,el){ filters[key]=val; el.closest('.fblock').querySelectorAll('.fopt').forEach(o=>o.classList.remove('active')); el.classList.add('active'); render(); }
 function mobFilter(key,val,el){ filters[key]=val; el.closest('.fp-chips').querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); render(); }
 function getFiltered(){
@@ -1316,20 +539,20 @@ function getFiltered(){
   const desde=isMob?document.getElementById('mob-desde')?.value:document.getElementById('sb-desde')?.value;
   const hasta=isMob?document.getElementById('mob-hasta')?.value:document.getElementById('sb-hasta')?.value;
   return data.tasks.filter(t=>{
-    if(q&&!t.titulo.toLowerCase().includes(q)&&!(t.notas||'').toLowerCase().includes(q)) return false;
-    if(filters.responsable&&t.responsable!==filters.responsable) return false;
-    if(filters.prioridad&&t.prioridad!==filters.prioridad) return false;
-    if(filters.estado==='Vencida'){ if(!(t.estado!=='Completada'&&t.limite&&t.limite<today())) return false; }
-    else if(filters.estado&&t.estado!==filters.estado) return false;
-    if(filters.inicio==='iniciada'&&!(t.inicio&&t.inicio<=today())) return false;
-    if(filters.inicio==='no_iniciada'&&!(t.inicio&&t.inicio>today())) return false;
-    if(desde&&t.limite&&t.limite<desde) return false;
-    if(hasta&&t.limite&&t.limite>hasta) return false;
+    if(q&&!t.titulo.toLowerCase().includes(q)&&!(t.notas||'').toLowerCase().includes(q))return false;
+    if(filters.responsable&&t.responsable!==filters.responsable)return false;
+    if(filters.prioridad&&t.prioridad!==filters.prioridad)return false;
+    if(filters.estado==='Vencida'){ if(!(t.estado!=='Completada'&&t.limite&&t.limite<today()))return false; }
+    else if(filters.estado&&t.estado!==filters.estado)return false;
+    if(filters.inicio==='iniciada'&&!(t.inicio&&t.inicio<=today()))return false;
+    if(filters.inicio==='no_iniciada'&&!(t.inicio&&t.inicio>today()))return false;
+    if(desde&&t.limite&&t.limite<desde)return false;
+    if(hasta&&t.limite&&t.limite>hasta)return false;
     return true;
   });
 }
 
-// ══ RENDER ══════════════════════════════════════════════════════
+// ══ RENDER ════════════════════════════════════════════════════════
 function render(){ updateStats(); renderResponsableFilters(); renderGroups(); }
 
 function updateStats(){
@@ -1350,36 +573,34 @@ function updateStats(){
 }
 
 function renderResponsableFilters(){
-  const personas=data.personas;
+  const p=data.personas;
   const sbEl=document.getElementById('sb-responsables');
-  if(sbEl){ sbEl.innerHTML=`<div class="fopt ${filters.responsable===''?'active':''}" onclick="sbFilter('responsable','',this)"><span>Todos</span><span class="fcnt">${data.tasks.length}</span></div>`+personas.map(p=>{const cnt=data.tasks.filter(t=>t.responsable===p).length;const[bg,cl]=avatarColor(p);return`<div class="fopt ${filters.responsable===p?'active':''}" onclick="sbFilter('responsable','${p}',this)"><span style="display:flex;align-items:center;gap:6px"><span class="p-avatar" style="background:${bg};color:${cl}">${initials(p)}</span>${p}</span><span class="fcnt">${cnt}</span></div>`;}).join('');}
+  if(sbEl) sbEl.innerHTML=`<div class="fopt ${!filters.responsable?'active':''}" onclick="sbFilter('responsable','',this)"><span>Todos</span><span class="fcnt">${data.tasks.length}</span></div>`+p.map(x=>{ const cnt=data.tasks.filter(t=>t.responsable===x).length; const[bg,cl]=avatarColor(x); return`<div class="fopt ${filters.responsable===x?'active':''}" onclick="sbFilter('responsable','${x}',this)"><span style="display:flex;align-items:center;gap:6px"><span class="p-avatar" style="background:${bg};color:${cl}">${initials(x)}</span>${x}</span><span class="fcnt">${cnt}</span></div>`; }).join('');
   const mobEl=document.getElementById('mob-resp-chips');
-  if(mobEl){ mobEl.innerHTML=`<div class="chip ${filters.responsable===''?'active':''}" onclick="mobFilter('responsable','',this)">Todos</div>`+personas.map(p=>`<div class="chip ${filters.responsable===p?'active':''}" onclick="mobFilter('responsable','${p}',this)">${p}</div>`).join('');}
+  if(mobEl) mobEl.innerHTML=`<div class="chip ${!filters.responsable?'active':''}" onclick="mobFilter('responsable','',this)">Todos</div>`+p.map(x=>`<div class="chip ${filters.responsable===x?'active':''}" onclick="mobFilter('responsable','${x}',this)">${x}</div>`).join('');
 }
 
 function renderGroups(){
   const list=getFiltered(); const wrap=document.getElementById('groups-wrap'); const isMob=window.innerWidth<=768;
-  const grupoMap={};
-  data.tasks.forEach(t=>{ const g=t.grupo||'__sin_grupo__'; const sg=t.subgrupo||'__sin_subgrupo__'; if(!grupoMap[g])grupoMap[g]={}; if(!grupoMap[g][sg])grupoMap[g][sg]=[]; });
-  list.forEach(t=>{ const g=t.grupo||'__sin_grupo__'; const sg=t.subgrupo||'__sin_subgrupo__'; if(!grupoMap[g])grupoMap[g]={}; if(!grupoMap[g][sg])grupoMap[g][sg]=[]; if(!grupoMap[g][sg].find(x=>x.id===t.id))grupoMap[g][sg].push(t); });
-  Object.keys(grupoMap).forEach(g=>Object.keys(grupoMap[g]).forEach(sg=>{ grupoMap[g][sg].sort((a,b)=>{ const p={Alta:0,Media:1,Baja:2}; if(p[a.prioridad]!==p[b.prioridad])return p[a.prioridad]-p[b.prioridad]; if(a.limite&&b.limite)return a.limite.localeCompare(b.limite); if(a.limite)return -1; if(b.limite)return 1; return 0; }); }));
+  const gm={};
+  data.tasks.forEach(t=>{ const g=t.grupo||'__sg__'; const s=t.subgrupo||'__ss__'; if(!gm[g])gm[g]={}; if(!gm[g][s])gm[g][s]=[]; });
+  list.forEach(t=>{ const g=t.grupo||'__sg__'; const s=t.subgrupo||'__ss__'; if(!gm[g])gm[g]={}; if(!gm[g][s])gm[g][s]=[]; if(!gm[g][s].find(x=>x.id===t.id))gm[g][s].push(t); });
+  Object.keys(gm).forEach(g=>Object.keys(gm[g]).forEach(s=>{ gm[g][s].sort((a,b)=>{ const p={Alta:0,Media:1,Baja:2}; if(p[a.prioridad]!==p[b.prioridad])return p[a.prioridad]-p[b.prioridad]; if(a.limite&&b.limite)return a.limite.localeCompare(b.limite); if(a.limite)return -1; if(b.limite)return 1; return 0; }); }));
   let html='';
-  const grupoKeys=Object.keys(grupoMap).sort((a,b)=>a==='__sin_grupo__'?1:b==='__sin_grupo__'?-1:a.localeCompare(b));
-  grupoKeys.forEach(g=>{
-    const gName=g==='__sin_grupo__'?null:g;
-    const totalEnGrupo=list.filter(t=>(t.grupo||'__sin_grupo__')===g).length;
-    const sgKeys=Object.keys(grupoMap[g]).sort((a,b)=>a==='__sin_subgrupo__'?1:b==='__sin_subgrupo__'?-1:a.localeCompare(b));
+  Object.keys(gm).sort((a,b)=>a==='__sg__'?1:b==='__sg__'?-1:a.localeCompare(b)).forEach(g=>{
+    const gName=g==='__sg__'?null:g;
+    const total=list.filter(t=>(t.grupo||'__sg__')===g).length;
     let sgHtml='';
-    sgKeys.forEach(sg=>{
-      const sgName=sg==='__sin_subgrupo__'?null:sg;
-      const sgTasks=grupoMap[g][sg];
-      const colHdr=isMob?`<div class="col-hdr"><span></span><span></span><span>Título / Detalle</span><div style="display:flex;gap:0;justify-content:flex-end"><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px">Inicio</span><span style="min-width:8px"></span><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px">Límite</span></div></div>`:`<div class="col-hdr"><span></span><span></span><span>Título</span><span>Responsable</span><span>Estado</span><span>Prioridad</span><span>F. inicio</span><span>F. límite</span></div>`;
-      const rowsHtml=sgTasks.map(t=>renderRow(t,isMob)).join('');
-      if(sgName){ sgHtml+=`<div class="subgrupo"><div class="sgrp-hdr" onclick="toggleSgrp(this)"><span class="sgrp-arrow">▾</span><span style="font-size:13px">📂</span><span class="sgrp-name">${esc(sgName)}</span><span class="sgrp-cnt">${sgTasks.length}</span></div><div class="sgrp-body">${colHdr}<div>${rowsHtml}</div></div></div>`; }
-      else{ sgHtml+=`<div class="subgrupo" style="border-top:${gName?'1px solid var(--border)':'none'}"><div class="sgrp-body">${colHdr}<div>${rowsHtml}</div></div></div>`; }
+    Object.keys(gm[g]).sort((a,b)=>a==='__ss__'?1:b==='__ss__'?-1:a.localeCompare(b)).forEach(s=>{
+      const sName=s==='__ss__'?null:s;
+      const tasks=gm[g][s];
+      const colHdr=isMob?`<div class="col-hdr"><span></span><span></span><span>Título / Detalle</span><div style="display:flex;justify-content:flex-end"><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase">Inicio</span><span style="min-width:8px"></span><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase">Límite</span></div></div>`:`<div class="col-hdr"><span></span><span></span><span>Título</span><span>Responsable</span><span>Estado</span><span>Prioridad</span><span>F. inicio</span><span>F. límite</span></div>`;
+      const rows=tasks.map(t=>renderRow(t,isMob)).join('');
+      if(sName) sgHtml+=`<div class="subgrupo"><div class="sgrp-hdr" onclick="toggleSgrp(this)"><span class="sgrp-arrow">▾</span><span style="font-size:13px">📂</span><span class="sgrp-name">${esc(sName)}</span><span class="sgrp-cnt">${tasks.length}</span></div><div class="sgrp-body">${colHdr}<div>${rows}</div></div></div>`;
+      else sgHtml+=`<div class="subgrupo" style="border-top:${gName?'1px solid var(--border)':'none'}"><div class="sgrp-body">${colHdr}<div>${rows}</div></div></div>`;
     });
-    if(gName){ html+=`<div class="grupo" data-grupo="${esc(gName)}"><div class="grp-hdr" onclick="toggleGrp(this)"><span class="grp-arrow">▾</span><span style="font-size:15px">📁</span><span class="grp-name">${esc(gName)}</span><span class="grp-cnt">${totalEnGrupo}</span><span class="grp-add desk-only" onclick="event.stopPropagation();addSubgrupo('${esc(gName)}')">+ Subgrupo</span></div><div class="grp-body">${sgHtml}</div></div>`; }
-    else{ html+=`<div class="grupo" style="border-style:dashed"><div class="grp-hdr" onclick="toggleGrp(this)" style="background:transparent"><span class="grp-arrow">▾</span><span style="font-size:15px">📄</span><span class="grp-name" style="color:var(--text3);font-style:italic">Sin grupo</span><span class="grp-cnt">${totalEnGrupo}</span></div><div class="grp-body">${sgHtml}</div></div>`; }
+    if(gName) html+=`<div class="grupo"><div class="grp-hdr" onclick="toggleGrp(this)"><span class="grp-arrow">▾</span><span style="font-size:15px">📁</span><span class="grp-name">${esc(gName)}</span><span class="grp-cnt">${total}</span><span class="grp-add desk-only" onclick="event.stopPropagation();addSubgrupo('${esc(gName)}')">+ Subgrupo</span></div><div class="grp-body">${sgHtml}</div></div>`;
+    else html+=`<div class="grupo" style="border-style:dashed"><div class="grp-hdr" onclick="toggleGrp(this)" style="background:transparent"><span class="grp-arrow">▾</span><span style="font-size:15px">📄</span><span class="grp-name" style="color:var(--text3);font-style:italic">Sin grupo</span><span class="grp-cnt">${total}</span></div><div class="grp-body">${sgHtml}</div></div>`;
   });
   html+=`<div class="add-grupo" onclick="addGrupo()"><span style="font-size:18px">+</span> Nuevo grupo</div>`;
   wrap.innerHTML=html;
@@ -1388,25 +609,23 @@ function renderGroups(){
 
 function renderRow(t,isMob){
   const p=(t.prioridad||'media').toLowerCase(); const done=t.estado==='Completada'; const dsi=ds(t.inicio); const dsl=ds(t.limite); const sel=selected.has(t.id);
-  if(isMob){ return`<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)"><div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div><div class="done-chk ${done?'on':''}" onclick="event.stopPropagation();toggleDone('${t.id}')"></div><div style="min-width:0;padding-right:4px"><div class="ttitle">${esc(t.titulo)}</div><div class="mob-badges"><span class="badge b-${p}">${t.prioridad}</span><span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span>${t.responsable?`<span class="badge" style="background:var(--surface2);color:var(--text2)">${esc(t.responsable)}</span>`:''}</div></div><div class="mob-dates"><div class="mob-date-cell"><span class="mob-date-lbl">inicio</span><span class="mob-date-val ${dsi}">${t.inicio?fmt(t.inicio):'—'}</span></div><span class="mob-date-sep">·</span><div class="mob-date-cell"><span class="mob-date-lbl">límite</span><span class="mob-date-val ${dsl}">${t.limite?(dsl==='v'?'⚠':dsl==='h'?'🔔':'')+fmt(t.limite):'—'}</span></div></div></div>`; }
-  else{ return`<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)" draggable="true" ondragstart="dragStart(event,'${t.id}')" ondragover="dragOver(event)" ondrop="drop(event,'${t.id}')"><div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div><div class="done-chk ${done?'on':''}" onclick="event.stopPropagation();toggleDone('${t.id}')"></div><div class="ttitle">${esc(t.titulo)}</div><div class="tcell">${t.responsable?esc(t.responsable):'—'}</div><div class="tcell"><span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span></div><div class="tcell"><span class="badge b-${p}">${t.prioridad}</span></div><div class="tcell date ${dsi}">${t.inicio?fmtFull(t.inicio):'—'}</div><div class="tcell date ${dsl}">${t.limite?(dsl==='v'?'⚠ ':dsl==='h'?'🔔 ':'')+fmtFull(t.limite):'—'}</div></div>`; }
+  if(isMob) return`<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)"><div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div><div class="done-chk ${done?'on':''}" onclick="event.stopPropagation();toggleDone('${t.id}')"></div><div style="min-width:0;padding-right:4px"><div class="ttitle">${esc(t.titulo)}</div><div class="mob-badges"><span class="badge b-${p}">${t.prioridad}</span><span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span>${t.responsable?`<span class="badge" style="background:var(--surface2);color:var(--text2)">${esc(t.responsable)}</span>`:''}</div></div><div class="mob-dates"><div class="mob-date-cell"><span class="mob-date-lbl">inicio</span><span class="mob-date-val ${dsi}">${t.inicio?fmt(t.inicio):'—'}</span></div><span class="mob-date-sep">·</span><div class="mob-date-cell"><span class="mob-date-lbl">límite</span><span class="mob-date-val ${dsl}">${t.limite?(dsl==='v'?'⚠':dsl==='h'?'🔔':'')+fmt(t.limite):'—'}</span></div></div></div>`;
+  return`<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)" draggable="true" ondragstart="dragStart(event,'${t.id}')" ondragover="dragOver(event)" ondrop="drop(event,'${t.id}')"><div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div><div class="done-chk ${done?'on':''}" onclick="event.stopPropagation();toggleDone('${t.id}')"></div><div class="ttitle">${esc(t.titulo)}</div><div class="tcell">${t.responsable?esc(t.responsable):'—'}</div><div class="tcell"><span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span></div><div class="tcell"><span class="badge b-${p}">${t.prioridad}</span></div><div class="tcell date ${dsi}">${t.inicio?fmtFull(t.inicio):'—'}</div><div class="tcell date ${dsl}">${t.limite?(dsl==='v'?'⚠ ':dsl==='h'?'🔔 ':'')+fmtFull(t.limite):'—'}</div></div>`;
 }
 
-function esc(s){ return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toggleGrp(h){ const b=h.nextElementSibling; const a=h.querySelector('.grp-arrow'); const o=b.style.display!=='none'; b.style.display=o?'none':'block'; a.classList.toggle('closed',!o); saveCollapsed(); }
+function toggleSgrp(h){ const b=h.nextElementSibling; const a=h.querySelector('.sgrp-arrow'); const o=b.style.display!=='none'; b.style.display=o?'none':'block'; a.classList.toggle('closed',!o); saveCollapsed(); }
+function saveCollapsed(){ const s={}; document.querySelectorAll('.grp-hdr').forEach(h=>{ const n=h.querySelector('.grp-name')?.textContent; s['g_'+n]=h.nextElementSibling.style.display==='none'; }); sessionStorage.setItem('tp_collapsed',JSON.stringify(s)); }
+function restoreCollapsed(){ try{ const s=JSON.parse(sessionStorage.getItem('tp_collapsed')||'{}'); document.querySelectorAll('.grp-hdr').forEach(h=>{ const n=h.querySelector('.grp-name')?.textContent; if(s['g_'+n]){ h.nextElementSibling.style.display='none'; h.querySelector('.grp-arrow')?.classList.add('closed'); } }); }catch(e){} }
 
-function toggleGrp(hdr){ const body=hdr.nextElementSibling; const arrow=hdr.querySelector('.grp-arrow'); const open=body.style.display!=='none'; body.style.display=open?'none':'block'; arrow.classList.toggle('closed',!open); saveCollapsed(); }
-function toggleSgrp(hdr){ const body=hdr.nextElementSibling; const arrow=hdr.querySelector('.sgrp-arrow'); const open=body.style.display!=='none'; body.style.display=open?'none':'block'; arrow.classList.toggle('closed',!open); saveCollapsed(); }
-function saveCollapsed(){ const state={}; document.querySelectorAll('.grp-hdr').forEach(h=>{ const name=h.querySelector('.grp-name')?.textContent; state['g_'+name]=h.nextElementSibling.style.display==='none'; }); sessionStorage.setItem('rvc_personal_collapsed',JSON.stringify(state)); }
-function restoreCollapsed(){ try{ const state=JSON.parse(sessionStorage.getItem('rvc_personal_collapsed')||'{}'); document.querySelectorAll('.grp-hdr').forEach(h=>{ const name=h.querySelector('.grp-name')?.textContent; if(state['g_'+name]){ h.nextElementSibling.style.display='none'; h.querySelector('.grp-arrow')?.classList.add('closed'); } }); }catch(e){} }
-
-function toggleRow(row){ const id=row.dataset.id; if(selected.has(id)){ selected.delete(id); row.classList.remove('selected'); row.querySelector('.sel-chk')?.classList.remove('on'); } else{ selected.add(id); row.classList.add('selected'); row.querySelector('.sel-chk')?.classList.add('on'); } updateActionBar(); }
-function toggleSel(id){ const row=document.querySelector(`.trow[data-id="${id}"]`); if(row)toggleRow(row); }
+function toggleRow(r){ const id=r.dataset.id; if(selected.has(id)){ selected.delete(id); r.classList.remove('selected'); r.querySelector('.sel-chk')?.classList.remove('on'); } else{ selected.add(id); r.classList.add('selected'); r.querySelector('.sel-chk')?.classList.add('on'); } updateActionBar(); }
+function toggleSel(id){ const r=document.querySelector(`.trow[data-id="${id}"]`); if(r)toggleRow(r); }
 function toggleDone(id){ const t=data.tasks.find(x=>x.id===id); if(!t)return; t.estado=t.estado==='Completada'?'Pendiente':'Completada'; saveToDrive(); render(); }
 function clearSelection(){ selected.clear(); updateActionBar(); render(); }
-function updateActionBar(){ const bar=document.getElementById('action-bar'); const info=document.getElementById('ab-info'); const editBtn=document.getElementById('abtn-edit'); const n=selected.size; if(!n){ bar.classList.remove('active'); return; } bar.classList.add('active'); info.textContent=n===1?'1 tarea seleccionada':`${n} tareas seleccionadas`; editBtn.style.opacity=n===1?'1':'0.4'; editBtn.style.pointerEvents=n===1?'auto':'none'; }
-function actionEdit(){ if(selected.size!==1)return; const id=[...selected][0]; openModal(data.tasks.find(t=>t.id===id)); }
+function updateActionBar(){ const bar=document.getElementById('action-bar'); const info=document.getElementById('ab-info'); const eb=document.getElementById('abtn-edit'); const n=selected.size; if(!n){ bar.classList.remove('active'); return; } bar.classList.add('active'); info.textContent=n===1?'1 tarea seleccionada':`${n} tareas seleccionadas`; eb.style.opacity=n===1?'1':'0.4'; eb.style.pointerEvents=n===1?'auto':'none'; }
+function actionEdit(){ if(selected.size!==1)return; openModal(data.tasks.find(t=>t.id==[...selected][0])); }
 function actionStatus(){ if(selected.size)document.getElementById('status-overlay').classList.add('open'); }
-function applyStatus(estado){ selected.forEach(id=>{ const t=data.tasks.find(x=>x.id===id); if(t)t.estado=estado; }); saveToDrive(); clearSelection(); closeStatusModal(); }
+function applyStatus(e){ selected.forEach(id=>{ const t=data.tasks.find(x=>x.id===id); if(t)t.estado=e; }); saveToDrive(); clearSelection(); closeStatusModal(); }
 function closeStatusModal(){ document.getElementById('status-overlay').classList.remove('open'); }
 function actionDelete(){ if(!selected.size)return; if(!confirm(`¿Eliminar ${selected.size} tarea(s)?`))return; data.tasks=data.tasks.filter(t=>!selected.has(t.id)); saveToDrive(); clearSelection(); }
 
@@ -1415,24 +634,20 @@ function closeModal(){ document.getElementById('overlay').classList.remove('open
 function setPrio(p){ selPrio=p; document.querySelectorAll('.segbtn').forEach(b=>b.classList.remove('sa','sm','sb')); const btns=document.querySelectorAll('.segbtn'); if(p==='Alta')btns[0].classList.add('sa'); else if(p==='Media')btns[1].classList.add('sm'); else btns[2].classList.add('sb'); }
 function saveTask(){ const titulo=document.getElementById('f-titulo').value.trim(); if(!titulo){ document.getElementById('f-titulo').focus(); return; } const t={ id:editId||uid(), titulo, grupo:document.getElementById('f-grupo').value.trim()||null, subgrupo:document.getElementById('f-subgrupo').value.trim()||null, responsable:document.getElementById('f-resp').value||null, inicio:document.getElementById('f-inicio').value||null, limite:document.getElementById('f-limite').value||null, prioridad:selPrio, estado:document.getElementById('f-estado').value, notas:document.getElementById('f-notas').value.trim()||null, creado:editId?(data.tasks.find(x=>x.id===editId)?.creado||today()):today() }; if(editId){ const i=data.tasks.findIndex(x=>x.id===editId); data.tasks[i]=t; } else data.tasks.unshift(t); saveToDrive(); closeModal(); render(); showToast(editId?'Tarea actualizada':'Tarea creada'); }
 
-function addGrupo(){ const name=prompt('Nombre del grupo:'); if(!name?.trim())return; openModal({grupo:name.trim()}); }
-function addSubgrupo(grupo){ const name=prompt(`Nombre del subgrupo en "${grupo}":`); if(!name?.trim())return; openModal({grupo,subgrupo:name.trim()}); }
+function addGrupo(){ const n=prompt('Nombre del grupo:'); if(!n?.trim())return; openModal({grupo:n.trim()}); }
+function addSubgrupo(g){ const n=prompt(`Nombre del subgrupo en "${g}":`); if(!n?.trim())return; openModal({grupo:g,subgrupo:n.trim()}); }
 
 function openPersonasModal(){ renderPersonasList(); document.getElementById('personas-overlay').classList.add('open'); }
 function closePersonasModal(){ document.getElementById('personas-overlay').classList.remove('open'); }
-function renderPersonasList(){ document.getElementById('personas-list').innerHTML=data.personas.map(p=>`<div class="persona-item"><span style="font-size:14px;font-weight:500">${esc(p)}</span><button class="persona-del" onclick="deletePersona('${esc(p)}')">✕</button></div>`).join('')||'<p style="font-size:13px;color:var(--text3);padding:8px 0">No hay personas agregadas aún.</p>'; }
-function addPersona(){ const val=document.getElementById('nueva-persona').value.trim(); if(!val||data.personas.includes(val))return; data.personas.push(val); document.getElementById('nueva-persona').value=''; renderPersonasList(); saveToDrive(); render(); }
-function deletePersona(name){ if(!confirm(`¿Eliminar a "${name}"?`))return; data.personas=data.personas.filter(p=>p!==name); renderPersonasList(); saveToDrive(); render(); }
+function renderPersonasList(){ document.getElementById('personas-list').innerHTML=data.personas.map(p=>`<div class="persona-item"><span style="font-size:14px;font-weight:500">${esc(p)}</span><button class="persona-del" onclick="deletePersona('${esc(p)}')">✕</button></div>`).join('')||'<p style="font-size:13px;color:var(--text3);padding:8px 0">No hay personas aún.</p>'; }
+function addPersona(){ const v=document.getElementById('nueva-persona').value.trim(); if(!v||data.personas.includes(v))return; data.personas.push(v); document.getElementById('nueva-persona').value=''; renderPersonasList(); saveToDrive(); render(); }
+function deletePersona(n){ if(!confirm(`¿Eliminar a "${n}"?`))return; data.personas=data.personas.filter(p=>p!==n); renderPersonasList(); saveToDrive(); render(); }
 
-function toggleMobFilter(){ const panel=document.getElementById('mob-filter-panel'); const arrow=document.getElementById('mob-filter-arrow'); const open=panel.classList.toggle('open'); arrow.style.transform=open?'rotate(180deg)':''; }
-
-let dragId=null;
+function toggleMobFilter(){ const p=document.getElementById('mob-filter-panel'); const a=document.getElementById('mob-filter-arrow'); const o=p.classList.toggle('open'); a.style.transform=o?'rotate(180deg)':''; }
 function dragStart(e,id){ dragId=id; e.dataTransfer.effectAllowed='move'; }
-function dragOver(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; }
-function drop(e,targetId){ e.preventDefault(); if(!dragId||dragId===targetId)return; const fromIdx=data.tasks.findIndex(t=>t.id===dragId); const toIdx=data.tasks.findIndex(t=>t.id===targetId); const[moved]=data.tasks.splice(fromIdx,1); moved.grupo=data.tasks[toIdx]?.grupo||null; moved.subgrupo=data.tasks[toIdx]?.subgrupo||null; data.tasks.splice(toIdx,0,moved); dragId=null; saveToDrive(); render(); showToast('Tarea movida'); }
-
+function dragOver(e){ e.preventDefault(); }
+function drop(e,targetId){ e.preventDefault(); if(!dragId||dragId===targetId)return; const fi=data.tasks.findIndex(t=>t.id===dragId); const ti=data.tasks.findIndex(t=>t.id===targetId); const[m]=data.tasks.splice(fi,1); m.grupo=data.tasks[ti]?.grupo||null; m.subgrupo=data.tasks[ti]?.subgrupo||null; data.tasks.splice(ti,0,m); dragId=null; saveToDrive(); render(); showToast('Tarea movida'); }
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
-
 window.addEventListener('resize',render);
 </script>
 </body>
