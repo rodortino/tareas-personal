@@ -143,8 +143,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .fblock-body.collapsed{display:none}
 /* Drag grupos */
 .grupo.drag-over{border:2px dashed var(--accent);background:var(--accent-l)}
-.grp-hdr .drag-handle{cursor:grab;color:var(--text3);font-size:14px;padding:0 4px}
-.grp-hdr .drag-handle:active{cursor:grabbing}
+.drag-handle{cursor:grab;color:var(--text3);font-size:14px;padding:0 4px;flex-shrink:0}
+.drag-handle:active{cursor:grabbing}
+.subgrupo.drag-over-sub{border-top:2px solid var(--accent)}
 
 .grupo{margin-bottom:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
 .grp-hdr{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--surface2);cursor:pointer;user-select:none;transition:background .12s}
@@ -169,7 +170,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .stat-num{font-size:20px;font-weight:600;letter-spacing:-1px;line-height:1}
 .stat-lbl{font-size:9px;font-weight:500;margin-top:3px}
 .fblock{padding:6px 12px 8px;border-bottom:1px solid var(--border)}
-.fblock-title{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.fblock-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:none;letter-spacing:0;margin-bottom:4px;padding:2px 0}
 .fopt{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .12s;user-select:none}
 .fopt:hover{background:var(--surface2)}
 .fopt.active{background:var(--accent-l);color:var(--accent);font-weight:600}
@@ -734,7 +735,7 @@ function renderGroups(){
       const tasks=gm[g][s];
       if(!tasks.length)return;
       const rows=tasks.map(t=>renderRow(t,isMob)).join('');
-      if(sName) sgHtml+=`<div class="subgrupo"><div class="sgrp-hdr" onclick="toggleSgrp(this)"><span class="sgrp-arrow">▾</span><span style="font-size:13px">📂</span><span class="sgrp-name">${esc(sName)}</span><span class="sgrp-cnt">${tasks.length}</span><span class="grp-add" onclick="event.stopPropagation();openModalConGrupo('${esc(gName)}','${esc(sName)}')" style="margin-left:auto;background:var(--accent);color:#fff;border-color:var(--accent)">+ Tarea</span></div><div class="sgrp-body"><div>${rows}</div></div></div>`;
+      if(sName) sgHtml+=`<div class="subgrupo" draggable="true" data-sgrp="${esc(sName)}" data-grupo="${esc(gName)}" ondragstart="dragSgrpStart(event,'${esc(gName)}','${esc(sName)}')" ondragover="dragSgrpOver(event)" ondrop="dragSgrpDrop(event,'${esc(gName)}','${esc(sName)}')" ondragleave="this.classList.remove('drag-over-sub')"><div class="sgrp-hdr" onclick="toggleSgrp(this)"><span class="drag-handle" onclick="event.stopPropagation()" title="Arrastrar">⠿</span><span class="sgrp-arrow">▾</span><span style="font-size:13px">📂</span><span class="sgrp-name">${esc(sName)}</span><span class="sgrp-cnt">${tasks.length}</span><span class="grp-add" onclick="event.stopPropagation();openModalConGrupo('${esc(gName)}','${esc(sName)}')" style="margin-left:auto;background:var(--accent);color:#fff;border-color:var(--accent)">+ Tarea</span></div><div class="sgrp-body"><div>${rows}</div></div></div>`;
       else sgHtml+=`<div class="subgrupo" style="border-top:${gName?'1px solid var(--border)':'none'}"><div class="sgrp-body"><div>${rows}</div></div></div>`;
     });
     if(!sgHtml)return;
@@ -783,7 +784,8 @@ function openModal(task){
   document.getElementById('f-notas').value=task?.notas||'';
   setPrio(task?.prioridad||'Baja');
   const sel=document.getElementById('f-resp');
-  sel.innerHTML='<option value="">Sin asignar</option>'+data.personas.map(p=>`<option${task?.responsable===p?' selected':''}>${esc(p)}</option>`).join('');
+  const personasOrdenadas=[...data.personas].sort((a,b)=>a.localeCompare(b));
+  sel.innerHTML='<option value="">Sin asignar</option>'+personasOrdenadas.map(p=>`<option${task?.responsable===p?' selected':''}>${esc(p)}</option>`).join('');
   // Datalists con grupos existentes
   const grupos=[...new Set(data.tasks.map(t=>t.grupo).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
   document.getElementById('grupos-list').innerHTML=grupos.map(g=>`<option value="${esc(g)}">`).join('');
@@ -950,6 +952,37 @@ function dragGrupoDrop(e, targetNombre){
     window.grupoOrder.splice(to,0,dragGrupoName);
   }
   dragGrupoName = null;
+  render();
+}
+
+// ── DRAG SUBGRUPOS ───────────────────────────────────────────
+if(!window.sgrupoOrder) window.sgrupoOrder = {};
+let dragSgrpData = null;
+
+function dragSgrpStart(e, grupo, sgrp){
+  dragSgrpData = {grupo, sgrp};
+  e.stopPropagation();
+  e.dataTransfer.effectAllowed = 'move';
+}
+function dragSgrpOver(e){
+  e.preventDefault();
+  e.stopPropagation();
+  e.currentTarget.classList.add('drag-over-sub');
+}
+function dragSgrpDrop(e, targetGrupo, targetSgrp){
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelectorAll('.subgrupo').forEach(s=>s.classList.remove('drag-over-sub'));
+  if(!dragSgrpData || dragSgrpData.sgrp === targetSgrp) return;
+  const g = dragSgrpData.grupo;
+  if(!window.sgrupoOrder[g]){
+    window.sgrupoOrder[g] = [...new Set(data.tasks.filter(t=>t.grupo===g).map(t=>t.subgrupo).filter(Boolean))];
+  }
+  const order = window.sgrupoOrder[g];
+  const from = order.indexOf(dragSgrpData.sgrp);
+  const to = order.indexOf(targetSgrp);
+  if(from>=0 && to>=0){ order.splice(from,1); order.splice(to,0,dragSgrpData.sgrp); }
+  dragSgrpData = null;
   render();
 }
 
