@@ -2,7 +2,7 @@
   "name": "Tareas RVC",
   "short_name": "Tareas RVC",
   "description": "Gestión de tareas RVC",
-  "start_url": "tareas_rvc_v1.html",
+  "start_url": "tareas_rvc.html",
   "display": "standalone",
   "background_color": "#F5F3EE",
   "theme_color": "#CC2929",
