@@ -281,6 +281,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="fblock">
         <div class="fblock-title">Estado</div>
         <div class="fopt active" onclick="sbFilter('estado','',this)"><span>Todos</span><span class="fcnt" id="cnt-est-all">0</span></div>
+        <div class="fopt" onclick="sbFilter('estado','Activa',this)"><span>▶ Activas</span><span class="fcnt" id="cnt-est-act">0</span></div>
         <div class="fopt" onclick="sbFilter('estado','Pendiente',this)"><span>⬜ Pendiente</span><span class="fcnt" id="cnt-est-pend">0</span></div>
         <div class="fopt" onclick="sbFilter('estado','En progreso',this)"><span>🔵 En progreso</span><span class="fcnt" id="cnt-est-prog">0</span></div>
         <div class="fopt" onclick="sbFilter('estado','Completada',this)"><span>✅ Completada</span><span class="fcnt" id="cnt-est-comp">0</span></div>
@@ -329,6 +330,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           <div class="fp-section"><div class="fp-title">Responsable</div><div class="fp-chips" id="mob-resp-chips"></div></div>
           <div class="fp-section"><div class="fp-title">Estado</div><div class="fp-chips">
             <div class="chip active" onclick="mobFilter('estado','',this)">Todos</div>
+            <div class="chip" onclick="mobFilter('estado','Activa',this)">▶ Activas</div>
             <div class="chip" onclick="mobFilter('estado','Pendiente',this)">Pendiente</div>
             <div class="chip" onclick="mobFilter('estado','En progreso',this)">En progreso</div>
             <div class="chip" onclick="mobFilter('estado','Completada',this)">Completada</div>
@@ -593,6 +595,7 @@ function getFiltered(){
     if(filters.responsable&&t.responsable!==filters.responsable)return false;
     if(filters.prioridad&&t.prioridad!==filters.prioridad)return false;
     if(filters.estado==='Vencida'){ if(!(t.estado!=='Completada'&&t.limite&&t.limite<today()))return false; }
+    else if(filters.estado==='Activa'){ if(t.estado==='Completada')return false; }
     else if(filters.estado&&t.estado!==filters.estado)return false;
     // Inicio: ya iniciada = fecha inicio <= hoy
     if(filters.inicio==='iniciada'&&!(t.inicio&&t.inicio<=today()))return false;
@@ -618,6 +621,7 @@ function updateStats(){
   document.getElementById('cnt-venc').textContent=t.filter(x=>x.estado!=='Completada'&&x.limite&&x.limite<tod).length;
   document.getElementById('cnt-comp').textContent=t.filter(x=>x.estado==='Completada').length;
   document.getElementById('cnt-est-all').textContent=t.length;
+  document.getElementById('cnt-est-act').textContent=t.filter(x=>x.estado==='Pendiente'||x.estado==='En progreso').length;
   document.getElementById('cnt-est-pend').textContent=t.filter(x=>x.estado==='Pendiente').length;
   document.getElementById('cnt-est-prog').textContent=t.filter(x=>x.estado==='En progreso').length;
   document.getElementById('cnt-est-comp').textContent=t.filter(x=>x.estado==='Completada').length;
