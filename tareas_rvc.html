@@ -297,9 +297,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="stat" style="background:var(--green-l)"><div class="stat-num" id="cnt-comp" style="color:var(--green)">0</div><div class="stat-lbl" style="color:var(--green)">Listas</div></div>
       </div>
       <div class="fblock">
-        <div class="fblock-title">Responsable</div>
-        <div id="sb-responsables"></div>
-        <div class="sb-manage" onclick="openPersonasModal()">⚙ Administrar personas</div>
+        <div class="fblock-title fblock-toggle" onclick="toggleFblock(this)">Responsable <span class="fblock-arrow">▾</span></div>
+        <div class="fblock-body">
+          <div id="sb-responsables"></div>
+          <div class="sb-manage" onclick="openPersonasModal()">⚙ Administrar personas</div>
+        </div>
       </div>
       <div class="fblock">
         <div class="fblock-title fblock-toggle" onclick="toggleFblock(this)">Estado <span class="fblock-arrow">▾</span></div>
@@ -974,14 +976,21 @@ function dragSgrpDrop(e, targetGrupo, targetSgrp){
   e.stopPropagation();
   document.querySelectorAll('.subgrupo').forEach(s=>s.classList.remove('drag-over-sub'));
   if(!dragSgrpData || dragSgrpData.sgrp === targetSgrp) return;
-  const g = dragSgrpData.grupo;
-  if(!window.sgrupoOrder[g]){
-    window.sgrupoOrder[g] = [...new Set(data.tasks.filter(t=>t.grupo===g).map(t=>t.subgrupo).filter(Boolean))];
+  if(dragSgrpData.grupo !== targetGrupo) return; // solo mismo grupo
+  const g = targetGrupo;
+  // Inicializar con TODOS los subgrupos actuales del grupo en orden actual
+  const todosSubgrupos = [...new Set(data.tasks.filter(t=>t.grupo===g).map(t=>t.subgrupo).filter(Boolean))];
+  if(!window.sgrupoOrder[g] || window.sgrupoOrder[g].length !== todosSubgrupos.length){
+    window.sgrupoOrder[g] = todosSubgrupos;
   }
   const order = window.sgrupoOrder[g];
+  // Asegurar que ambos están en el array
+  if(!order.includes(dragSgrpData.sgrp)) order.push(dragSgrpData.sgrp);
+  if(!order.includes(targetSgrp)) order.push(targetSgrp);
   const from = order.indexOf(dragSgrpData.sgrp);
   const to = order.indexOf(targetSgrp);
-  if(from>=0 && to>=0){ order.splice(from,1); order.splice(to,0,dragSgrpData.sgrp); }
+  order.splice(from, 1);
+  order.splice(to, 0, dragSgrpData.sgrp);
   dragSgrpData = null;
   render();
 }
