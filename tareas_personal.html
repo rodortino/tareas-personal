@@ -58,36 +58,41 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .mob-only{display:none!important}
   .layout{display:flex;flex:1;overflow:hidden;min-height:0}
   .sidebar{width:225px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
-  .content{flex:1;overflow-y:auto;min-width:0;display:flex;flex-direction:column}
+  .content{flex:1;overflow-y:hidden;min-width:0;display:flex;flex-direction:column}
   .action-bar{padding:8px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;min-height:44px;background:var(--surface);flex-shrink:0;transition:background .2s}
   .action-bar.active{background:#0f2d4a}
-  .search-bar{padding:10px 20px 6px;flex-shrink:0}
-  .groups-wrap{padding:0 20px 60px;flex:1}
+.action-bar-wrap{position:sticky;top:0;z-index:50;flex-shrink:0}
+  .search-bar{padding:10px 20px 6px;flex-shrink:0;background:var(--bg)}
+  .groups-wrap{padding:0 20px 60px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
   /* Global col header for desktop */
-  .global-col-hdr{display:grid;grid-template-columns:28px 22px 1fr 100px 110px 78px 92px 92px;gap:0;padding:6px 12px 6px 26px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border)}
-  .trow{display:grid;grid-template-columns:28px 22px 1fr 100px 110px 78px 92px 92px;gap:0;padding:8px 12px 8px 26px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
+  .global-col-hdr{display:grid;grid-template-columns:28px 1fr 100px 110px 78px 92px 92px;gap:0;padding:6px 12px 6px 26px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border)}
+  .trow{display:grid;grid-template-columns:28px 1fr 100px 110px 78px 92px 92px;gap:0;padding:8px 12px 8px 26px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
   .trow:hover{background:#FAFAF8}
 }
 @media(max-width:768px){
   .desk-only{display:none!important}
   .layout{display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0}
   .sidebar{display:none}
-  .content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+  .content{flex:1;overflow-y:hidden;display:flex;flex-direction:column}
   .action-bar{padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;min-height:44px;background:var(--surface);flex-shrink:0;transition:background .2s}
   .action-bar.active{background:#0f2d4a}
-  .search-bar{padding:8px 14px 4px;flex-shrink:0}
-  .groups-wrap{padding:0 14px 80px;flex:1}
-  .global-col-hdr{display:grid;grid-template-columns:26px 22px 1fr auto;gap:0;padding:6px 12px 6px 22px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border)}
-  .trow{display:grid;grid-template-columns:26px 22px 1fr auto;gap:0;padding:9px 12px 9px 22px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
+.action-bar-wrap{position:sticky;top:0;z-index:50;flex-shrink:0}
+  .search-bar{padding:8px 14px 4px;flex-shrink:0;background:var(--bg)}
+  .groups-wrap{padding:0 14px 80px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .global-col-hdr{display:grid;grid-template-columns:26px 1fr auto;gap:0;padding:6px 12px 6px 22px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border)}
+  .trow{display:grid;grid-template-columns:26px 1fr auto;gap:0;padding:9px 12px 9px 22px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
   .trow:active{background:#FAFAF8}
   .mob-filter-toggle{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-bottom:1px solid var(--border);padding:11px 14px;cursor:pointer;min-height:var(--touch);flex-shrink:0}
-  .mob-filter-panel{background:var(--surface);border-bottom:2px solid var(--accent);display:none;flex-shrink:0;overflow-y:auto;max-height:60vh}
+  .mob-filter-panel{background:var(--surface);border-bottom:2px solid var(--accent);display:none;flex-shrink:0;overflow-y:auto;max-height:75vh}
+  .active-chips-bar{display:flex;gap:6px;flex-wrap:wrap;padding:6px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+  .active-chip{display:flex;align-items:center;gap:4px;background:var(--accent-l);color:var(--accent);border:1px solid var(--accent);border-radius:12px;padding:3px 8px 3px 10px;font-size:11px;font-weight:600;white-space:nowrap}
+  .active-chip-x{cursor:pointer;font-size:13px;opacity:.7;line-height:1}
   .mob-filter-panel.open{display:block}
   .fp-inner{padding:12px 16px 16px}
   .fp-section{margin-bottom:14px}.fp-section:last-child{margin-bottom:0}
   .fp-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
   .fp-chips{display:flex;gap:6px;flex-wrap:wrap}
-  .chip{padding:7px 13px;border-radius:16px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:var(--bg);color:var(--text2);min-height:36px;display:flex;align-items:center;white-space:nowrap}
+  .chip{padding:5px 11px;border-radius:14px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:var(--bg);color:var(--text2);min-height:36px;display:flex;align-items:center;white-space:nowrap}
   .chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
   .fp-dates{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .fp-date-lbl{font-size:11px;color:var(--text3);margin-bottom:4px}
@@ -129,6 +134,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .mob-date-val.v{color:var(--red);font-weight:600}.mob-date-val.h{color:var(--amber);font-weight:600}
 .mob-date-sep{color:var(--border);font-size:10px}
 .mob-badges{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+
+/* Filtros colapsables sidebar */
+.fblock-toggle{cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.fblock-toggle:hover{color:var(--text)}
+.fblock-arrow{font-size:10px;transition:transform .2s;color:var(--text3)}
+.fblock-body{overflow:hidden;transition:max-height .2s ease}
+.fblock-body.collapsed{display:none}
+/* Drag grupos */
+.grupo.drag-over{border:2px dashed var(--accent);background:var(--accent-l)}
+.drag-handle{cursor:grab;color:var(--text3);font-size:14px;padding:0 4px;flex-shrink:0}
+.drag-handle:active{cursor:grabbing}
+.sgrp-btns{display:flex;flex-direction:column;gap:1px;flex-shrink:0}
+.sgrp-move-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:9px;padding:0 3px;line-height:1.2;display:block}
+.sgrp-move-btn:hover{color:var(--accent)}
+
 .grupo{margin-bottom:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
 .grp-hdr{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--surface2);cursor:pointer;user-select:none;transition:background .12s}
 .grp-hdr:hover,.grp-hdr:active{background:#E8E4DC}
@@ -151,9 +171,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .stat{border-radius:8px;padding:9px 8px;text-align:center}
 .stat-num{font-size:20px;font-weight:600;letter-spacing:-1px;line-height:1}
 .stat-lbl{font-size:9px;font-weight:500;margin-top:3px}
-.fblock{padding:8px 12px 10px;border-bottom:1px solid var(--border)}
-.fblock-title{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
-.fopt{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--text2);transition:all .12s;user-select:none}
+.fblock{padding:6px 12px 8px;border-bottom:1px solid var(--border)}
+.fblock-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:none;letter-spacing:0;margin-bottom:4px;padding:2px 0}
+.fopt{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .12s;user-select:none}
 .fopt:hover{background:var(--surface2)}
 .fopt.active{background:var(--accent-l);color:var(--accent);font-weight:600}
 .fcnt{font-size:10px;padding:1px 6px;border-radius:8px;background:var(--surface2);color:var(--text3);font-weight:600}
@@ -279,43 +299,54 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="stat" style="background:var(--green-l)"><div class="stat-num" id="cnt-comp" style="color:var(--green)">0</div><div class="stat-lbl" style="color:var(--green)">Listas</div></div>
       </div>
       <div class="fblock">
-        <div class="fblock-title">Responsable</div>
-        <div id="sb-responsables"></div>
-        <div class="sb-manage" onclick="openPersonasModal()">⚙ Administrar personas</div>
+        <div class="fblock-title fblock-toggle" onclick="toggleFblock(this)">Responsable <span class="fblock-arrow">▾</span></div>
+        <div class="fblock-body">
+          <div id="sb-responsables"></div>
+          <div class="sb-manage" onclick="openPersonasModal()">⚙ Administrar personas</div>
+        </div>
       </div>
       <div class="fblock">
-        <div class="fblock-title">Estado</div>
-        <div class="fopt active" onclick="sbFilter('estado','',this)"><span>Todos</span><span class="fcnt" id="cnt-est-all">0</span></div>
-        <div class="fopt" onclick="sbFilter('estado','Activa',this)"><span>▶ Activas</span><span class="fcnt" id="cnt-est-act">0</span></div>
-        <div class="fopt" onclick="sbFilter('estado','Pendiente',this)"><span>⬜ Pendiente</span><span class="fcnt" id="cnt-est-pend">0</span></div>
-        <div class="fopt" onclick="sbFilter('estado','En progreso',this)"><span>🔵 En progreso</span><span class="fcnt" id="cnt-est-prog">0</span></div>
-        <div class="fopt" onclick="sbFilter('estado','Completada',this)"><span>✅ Completada</span><span class="fcnt" id="cnt-est-comp">0</span></div>
-        <div class="fopt" style="color:var(--red)" onclick="sbFilter('estado','Vencida',this)"><span>⚠ Vencidas</span><span class="fcnt" id="cnt-est-venc">0</span></div>
+        <div class="fblock-title fblock-toggle" onclick="toggleFblock(this)">Estado <span class="fblock-arrow">▾</span></div>
+        <div class="fblock-body">
+          <div class="fopt active" onclick="sbFilter('estado','',this)"><span>Todos</span><span class="fcnt" id="cnt-est-all">0</span></div>
+          <div class="fopt" onclick="sbFilter('estado','Activa',this)"><span>▶ Activas</span><span class="fcnt" id="cnt-est-act">0</span></div>
+          <div class="fopt" onclick="sbFilter('estado','Pendiente',this)"><span>⬜ Pendiente</span><span class="fcnt" id="cnt-est-pend">0</span></div>
+          <div class="fopt" onclick="sbFilter('estado','En progreso',this)"><span>🔵 En progreso</span><span class="fcnt" id="cnt-est-prog">0</span></div>
+          <div class="fopt" onclick="sbFilter('estado','Completada',this)"><span>✅ Completada</span><span class="fcnt" id="cnt-est-comp">0</span></div>
+          <div class="fopt" style="color:var(--red)" onclick="sbFilter('estado','Vencida',this)"><span>⚠ Vencidas</span><span class="fcnt" id="cnt-est-venc">0</span></div>
+        </div>
       </div>
       <div class="fblock">
-        <div class="fblock-title">Prioridad</div>
-        <div class="fopt active" onclick="sbFilter('prioridad','',this)"><span>Todas</span><span class="fcnt" id="cnt-prio-all">0</span></div>
-        <div class="fopt" onclick="sbFilter('prioridad','Alta',this)"><span>🔴 Alta</span><span class="fcnt" id="cnt-prio-alta">0</span></div>
-        <div class="fopt" onclick="sbFilter('prioridad','Media',this)"><span>🟡 Media</span><span class="fcnt" id="cnt-prio-media">0</span></div>
-        <div class="fopt" onclick="sbFilter('prioridad','Baja',this)"><span>🟢 Baja</span><span class="fcnt" id="cnt-prio-baja">0</span></div>
+        <div class="fblock-title fblock-toggle" onclick="toggleFblock(this)">Prioridad <span class="fblock-arrow">▾</span></div>
+        <div class="fblock-body">
+          <div class="fopt active" onclick="sbFilter('prioridad','',this)"><span>Todas</span><span class="fcnt" id="cnt-prio-all">0</span></div>
+          <div class="fopt" onclick="sbFilter('prioridad','Alta',this)"><span>🔴 Alta</span><span class="fcnt" id="cnt-prio-alta">0</span></div>
+          <div class="fopt" onclick="sbFilter('prioridad','Media',this)"><span>🟡 Media</span><span class="fcnt" id="cnt-prio-media">0</span></div>
+          <div class="fopt" onclick="sbFilter('prioridad','Baja',this)"><span>🟢 Baja</span><span class="fcnt" id="cnt-prio-baja">0</span></div>
+        </div>
       </div>
       <div class="fblock">
-        <div class="fblock-title">Fecha inicio</div>
-        <div class="fopt active" onclick="sbFilter('inicio','',this)"><span>Todas</span></div>
-        <div class="fopt" onclick="sbFilter('inicio','iniciada',this)"><span>▶ Ya iniciadas</span></div>
-        <div class="fopt" onclick="sbFilter('inicio','no_iniciada',this)"><span>⏳ No iniciadas</span></div>
+        <div class="fblock-title fblock-toggle" onclick="toggleFblock(this)">Fecha inicio <span class="fblock-arrow">▾</span></div>
+        <div class="fblock-body">
+          <div class="fopt active" onclick="sbFilter('inicio','',this)"><span>Todas</span></div>
+          <div class="fopt" onclick="sbFilter('inicio','iniciada',this)"><span>▶ Ya iniciadas</span></div>
+          <div class="fopt" onclick="sbFilter('inicio','no_iniciada',this)"><span>⏳ No iniciadas</span></div>
+        </div>
       </div>
       <div class="fblock">
-        <div class="fblock-title">Fecha límite</div>
-        <div class="fdate-row"><div class="fdate-lbl">Desde</div><input class="fdate-input" type="date" id="sb-desde" onchange="render()"></div>
-        <div class="fdate-row"><div class="fdate-lbl">Hasta</div><input class="fdate-input" type="date" id="sb-hasta" onchange="render()"></div>
-        <span class="fclear" onclick="document.getElementById('sb-desde').value='';document.getElementById('sb-hasta').value='';render()">✕ Limpiar rango</span>
+        <div class="fblock-title fblock-toggle" onclick="toggleFblock(this)">Fecha límite <span class="fblock-arrow">▾</span></div>
+        <div class="fblock-body">
+          <div class="fdate-row"><div class="fdate-lbl">Desde</div><input class="fdate-input" type="date" id="sb-desde" onchange="render()"></div>
+          <div class="fdate-row"><div class="fdate-lbl">Hasta</div><input class="fdate-input" type="date" id="sb-hasta" onchange="render()"></div>
+          <span class="fclear" onclick="document.getElementById('sb-desde').value='';document.getElementById('sb-hasta').value='';render()">✕ Limpiar rango</span>
+        </div>
       </div>
       <button class="clear-filters-btn" onclick="clearAllFilters()">✕ Limpiar todos los filtros</button>
     </div>
 
     <!-- CONTENT -->
     <div class="content">
+      <div class="action-bar-wrap">
       <div class="action-bar" id="action-bar">
         <span class="ab-hint">Selecciona tareas para ver acciones</span>
         <span class="ab-info" id="ab-info"></span>
@@ -364,6 +395,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           </div>
         </div>
       </div>
+
+      <!-- Active filter chips -->
+      <div class="active-chips-bar mob-only" id="active-chips-bar" style="display:none"></div>
+
+      </div><!-- /action-bar-wrap -->
 
       <!-- Search -->
       <div class="search-bar">
@@ -553,7 +589,7 @@ async function loadFromDrive(){
       driveFileId=r.result.files[0].id;
       const res=await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,{headers:{Authorization:`Bearer ${accessToken}`}});
       data=await res.json();
-      if(!data.tasks)data.tasks=[]; if(!data.personas)data.personas=[];
+      if(!data.tasks)data.tasks=[]; if(!data.personas)data.personas=[]; if(!data.grupoOrder)data.grupoOrder=[]; if(!data.sgrupoOrder)data.sgrupoOrder={};
     } else { data={tasks:[],personas:[]}; }
     setSyncStatus('ok','Sincronizado'); render();
   }catch(e){ setSyncStatus('error','Error de sincronización'); data={tasks:[],personas:[]}; render(); }
@@ -639,7 +675,7 @@ function getFiltered(){
 }
 
 // ══ RENDER ════════════════════════════════════════════════════════
-function render(){ updateStats(); renderResponsableFilters(); renderGroups(); }
+function render(){ updateStats(); renderResponsableFilters(); renderGroups(); renderActiveChips(); }
 
 function updateStats(){
   const t=data.tasks; const tod=today();
@@ -660,7 +696,7 @@ function updateStats(){
 }
 
 function renderResponsableFilters(){
-  const p=data.personas;
+  const p=[...data.personas].sort((a,b)=>a.localeCompare(b));
   const sbEl=document.getElementById('sb-responsables');
   if(sbEl) sbEl.innerHTML=`<div class="fopt ${!filters.responsable?'active':''}" onclick="sbFilter('responsable','',this)"><span>Todos</span><span class="fcnt">${data.tasks.length}</span></div>`+p.map(x=>{ const cnt=data.tasks.filter(t=>t.responsable===x).length; const[bg,cl]=avatarColor(x); return`<div class="fopt ${filters.responsable===x?'active':''}" onclick="sbFilter('responsable','${x}',this)"><span style="display:flex;align-items:center;gap:6px"><span class="p-avatar" style="background:${bg};color:${cl}">${initials(x)}</span>${x}</span><span class="fcnt">${cnt}</span></div>`; }).join('');
   const mobEl=document.getElementById('mob-resp-chips');
@@ -684,20 +720,37 @@ function renderGroups(){
   }
 
   let html='';
-  Object.keys(gm).sort((a,b)=>a==='__sg__'?1:b==='__sg__'?-1:a.localeCompare(b)).forEach(g=>{
+  // Ordenar grupos: primero según grupoOrder si existe, luego alfabético
+  const allGrupoKeys = Object.keys(gm);
+  allGrupoKeys.sort((a,b)=>{
+    if(a==='__sg__') return 1; if(b==='__sg__') return -1;
+    const oi = data.grupoOrder||[];
+    const ai = oi.indexOf(a); const bi = oi.indexOf(b);
+    if(ai>=0 && bi>=0) return ai-bi;
+    if(ai>=0) return -1; if(bi>=0) return 1;
+    return a.localeCompare(b);
+  });
+  allGrupoKeys.forEach(g=>{
     const gName=g==='__sg__'?null:g;
     const total=list.filter(t=>(t.grupo||'__sg__')===g).length;
     let sgHtml='';
-    Object.keys(gm[g]).sort((a,b)=>a==='__ss__'?1:b==='__ss__'?-1:a.localeCompare(b)).forEach(s=>{
+    const sgrpOrder = (gName && data.sgrupoOrder && data.sgrupoOrder[gName]) || [];
+    Object.keys(gm[g]).sort((a,b)=>{
+      if(a==='__ss__') return 1; if(b==='__ss__') return -1;
+      const ai=sgrpOrder.indexOf(a); const bi=sgrpOrder.indexOf(b);
+      if(ai>=0&&bi>=0) return ai-bi;
+      if(ai>=0) return -1; if(bi>=0) return 1;
+      return a.localeCompare(b);
+    }).forEach(s=>{
       const sName=s==='__ss__'?null:s;
       const tasks=gm[g][s];
       if(!tasks.length)return;
       const rows=tasks.map(t=>renderRow(t,isMob)).join('');
-      if(sName) sgHtml+=`<div class="subgrupo"><div class="sgrp-hdr" onclick="toggleSgrp(this)"><span class="sgrp-arrow">▾</span><span style="font-size:13px">📂</span><span class="sgrp-name">${esc(sName)}</span><span class="sgrp-cnt">${tasks.length}</span></div><div class="sgrp-body"><div>${rows}</div></div></div>`;
+      if(sName) sgHtml+=`<div class="subgrupo"><div class="sgrp-hdr" onclick="toggleSgrp(this)"><span class="sgrp-btns"><button class="sgrp-move-btn" onclick="event.stopPropagation();moveSgrp('${esc(gName)}','${esc(sName)}',-1)" title="Subir">▲</button><button class="sgrp-move-btn" onclick="event.stopPropagation();moveSgrp('${esc(gName)}','${esc(sName)}',1)" title="Bajar">▼</button></span><span class="sgrp-arrow">▾</span><span style="font-size:13px">📂</span><span class="sgrp-name">${esc(sName)}</span><span class="sgrp-cnt">${tasks.length}</span><span class="grp-add" onclick="event.stopPropagation();openModalConGrupo('${esc(gName)}','${esc(sName)}')" style="margin-left:auto;background:var(--accent);color:#fff;border-color:var(--accent)">+ Tarea</span></div><div class="sgrp-body"><div>${rows}</div></div></div>`;
       else sgHtml+=`<div class="subgrupo" style="border-top:${gName?'1px solid var(--border)':'none'}"><div class="sgrp-body"><div>${rows}</div></div></div>`;
     });
     if(!sgHtml)return;
-    if(gName) html+=`<div class="grupo"><div class="grp-hdr" onclick="toggleGrp(this)"><span class="grp-arrow">▾</span><span style="font-size:15px">📁</span><span class="grp-name">${esc(gName)}</span><span class="grp-cnt">${total}</span><span class="grp-add desk-only" onclick="event.stopPropagation();addSubgrupo('${esc(gName)}')">+ Subgrupo</span></div><div class="grp-body">${sgHtml}</div></div>`;
+    if(gName) html+=`<div class="grupo" draggable="true" data-grupo="${esc(gName)}" ondragstart="dragGrupoStart(event,'${esc(gName)}')" ondragover="dragGrupoOver(event)" ondrop="dragGrupoDrop(event,'${esc(gName)}')"><div class="grp-hdr" onclick="toggleGrp(this)"><span class="drag-handle" onclick="event.stopPropagation()" title="Arrastrar para reordenar">⠿</span><span class="grp-arrow">▾</span><span style="font-size:15px">📁</span><span class="grp-name">${esc(gName)}</span><span class="grp-cnt">${total}</span><span class="grp-add desk-only" onclick="event.stopPropagation();addSubgrupo('${esc(gName)}')">+ Subgrupo</span></div><div class="grp-body">${sgHtml}</div></div>`;
     else html+=`<div class="grupo" style="border-style:dashed"><div class="grp-hdr" onclick="toggleGrp(this)" style="background:transparent"><span class="grp-arrow">▾</span><span style="font-size:15px">📄</span><span class="grp-name" style="color:var(--text3);font-style:italic">Sin grupo</span><span class="grp-cnt">${total}</span></div><div class="grp-body">${sgHtml}</div></div>`;
   });
   html+=`<div class="add-grupo" onclick="addGrupo()"><span style="font-size:18px">+</span> Nuevo grupo</div>`;
@@ -709,8 +762,8 @@ function renderRow(t,isMob){
   const p=(t.prioridad||'media').toLowerCase(); const done=t.estado==='Completada'; const dsi=ds(t.inicio); const dsl=ds(t.limite); const sel=selected.has(t.id);
   const subs=t.subtareas||[]; const totalSubs=subs.length; const doneSubs=subs.filter(s=>s.done).length;
   const subInfo=totalSubs>0?`<div class="sub-indicator ${doneSubs<totalSubs?'has-pending':''}">☑ ${doneSubs}/${totalSubs} subtareas</div>`:'';
-  if(isMob) return`<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)"><div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div><div class="done-chk ${done?'on':''}" onclick="event.stopPropagation();toggleDone('${t.id}')"></div><div style="min-width:0;padding-right:4px"><div class="ttitle">${esc(t.titulo)}</div><div class="mob-badges"><span class="badge b-${p}">${t.prioridad}</span><span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span>${t.responsable?`<span class="badge" style="background:var(--surface2);color:var(--text2)">${esc(t.responsable)}</span>`:''}</div>${subInfo}</div><div class="mob-dates"><div class="mob-date-cell"><span class="mob-date-lbl">inicio</span><span class="mob-date-val ${dsi}">${t.inicio?fmt(t.inicio):'—'}</span></div><span class="mob-date-sep">·</span><div class="mob-date-cell"><span class="mob-date-lbl">límite</span><span class="mob-date-val ${dsl}">${t.limite?(dsl==='v'?'⚠':dsl==='h'?'🔔':'')+fmt(t.limite):'—'}</span></div></div></div>`;
-  return`<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)" draggable="true" ondragstart="dragStart(event,'${t.id}')" ondragover="dragOver(event)" ondrop="drop(event,'${t.id}')"><div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div><div class="done-chk ${done?'on':''}" onclick="event.stopPropagation();toggleDone('${t.id}')"></div><div style="min-width:0;padding-right:8px;overflow:hidden"><div class="ttitle">${esc(t.titulo)}</div>${subInfo}</div><div class="tcell">${t.responsable?esc(t.responsable):'—'}</div><div class="tcell"><span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span></div><div class="tcell"><span class="badge b-${p}">${t.prioridad}</span></div><div class="tcell date ${dsi}">${t.inicio?fmtFull(t.inicio):'—'}</div><div class="tcell date ${dsl}">${t.limite?(dsl==='v'?'⚠ ':dsl==='h'?'🔔 ':'')+fmtFull(t.limite):'—'}</div></div>`;
+  if(isMob) return`<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)"><div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div><div style="min-width:0;padding-right:4px"><div class="ttitle">${esc(t.titulo)}</div><div class="mob-badges"><span class="badge b-${p}">${t.prioridad}</span><span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span>${t.responsable?`<span class="badge" style="background:var(--surface2);color:var(--text2)">${esc(t.responsable)}</span>`:''}</div>${subInfo}</div><div class="mob-dates"><div class="mob-date-cell"><span class="mob-date-lbl">inicio</span><span class="mob-date-val ${dsi}">${t.inicio?fmt(t.inicio):'—'}</span></div><span class="mob-date-sep">·</span><div class="mob-date-cell"><span class="mob-date-lbl">límite</span><span class="mob-date-val ${dsl}">${t.limite?(dsl==='v'?'⚠':dsl==='h'?'🔔':'')+fmt(t.limite):'—'}</span></div></div></div>`;
+  return`<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)" draggable="true" ondragstart="dragStart(event,'${t.id}')" ondragover="dragOver(event)" ondrop="drop(event,'${t.id}')"><div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div><div style="min-width:0;padding-right:8px;overflow:hidden"><div class="ttitle">${esc(t.titulo)}</div>${subInfo}</div><div class="tcell">${t.responsable?esc(t.responsable):'—'}</div><div class="tcell"><span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span></div><div class="tcell"><span class="badge b-${p}">${t.prioridad}</span></div><div class="tcell date ${dsi}">${t.inicio?fmtFull(t.inicio):'—'}</div><div class="tcell date ${dsl}">${t.limite?(dsl==='v'?'⚠ ':dsl==='h'?'🔔 ':'')+fmtFull(t.limite):'—'}</div></div>`;
 }
 
 function toggleGrp(h){ const b=h.nextElementSibling; const a=h.querySelector('.grp-arrow'); const o=b.style.display!=='none'; b.style.display=o?'none':'block'; a.classList.toggle('closed',!o); saveCollapsed(); }
@@ -740,11 +793,12 @@ function openModal(task){
   document.getElementById('f-limite').value=task?.limite||'';
   document.getElementById('f-estado').value=task?.estado||'Pendiente';
   document.getElementById('f-notas').value=task?.notas||'';
-  setPrio(task?.prioridad||'Alta');
+  setPrio(task?.prioridad||'Baja');
   const sel=document.getElementById('f-resp');
-  sel.innerHTML='<option value="">Sin asignar</option>'+data.personas.map(p=>`<option${task?.responsable===p?' selected':''}>${esc(p)}</option>`).join('');
+  const personasOrdenadas=[...data.personas].sort((a,b)=>a.localeCompare(b));
+  sel.innerHTML='<option value="">Sin asignar</option>'+personasOrdenadas.map(p=>`<option${task?.responsable===p?' selected':''}>${esc(p)}</option>`).join('');
   // Datalists con grupos existentes
-  const grupos=[...new Set(data.tasks.map(t=>t.grupo).filter(Boolean))];
+  const grupos=[...new Set(data.tasks.map(t=>t.grupo).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
   document.getElementById('grupos-list').innerHTML=grupos.map(g=>`<option value="${esc(g)}">`).join('');
   // Subgrupos del grupo seleccionado
   updateSubgruposList();
@@ -763,7 +817,7 @@ function saveTask(){
   if(!titulo){ document.getElementById('f-titulo').focus(); return; }
   const t={ id:editId||uid(), titulo, grupo:document.getElementById('f-grupo').value.trim()||null, subgrupo:document.getElementById('f-subgrupo').value.trim()||null, responsable:document.getElementById('f-resp').value||null, inicio:document.getElementById('f-inicio').value||null, limite:document.getElementById('f-limite').value||null, prioridad:selPrio, estado:document.getElementById('f-estado').value, notas:document.getElementById('f-notas').value.trim()||null, subtareas:tempSubtareas, creado:editId?(data.tasks.find(x=>x.id===editId)?.creado||today()):today() };
   if(editId){ const i=data.tasks.findIndex(x=>x.id===editId); data.tasks[i]=t; }else data.tasks.unshift(t);
-  saveToDrive(); closeModal(); render(); showToast(editId?'Tarea actualizada':'Tarea creada');
+  saveToDrive(); closeModal(); selected.clear(); updateActionBar(); render(); showToast(editId?'Tarea actualizada':'Tarea creada');
 }
 
 // ══ SUBGRUPOS ASOCIADOS ══════════════════════════════════════════
@@ -777,9 +831,9 @@ function updateSubgruposList(){
   const grupoActual=document.getElementById('f-grupo').value.trim();
   let subgrupos;
   if(grupoActual){
-    subgrupos=[...new Set(data.tasks.filter(t=>t.grupo===grupoActual).map(t=>t.subgrupo).filter(Boolean))];
+    subgrupos=[...new Set(data.tasks.filter(t=>t.grupo===grupoActual).map(t=>t.subgrupo).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
   } else {
-    subgrupos=[...new Set(data.tasks.map(t=>t.subgrupo).filter(Boolean))];
+    subgrupos=[...new Set(data.tasks.map(t=>t.subgrupo).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
   }
   document.getElementById('subgrupos-list').innerHTML=subgrupos.map(s=>`<option value="${esc(s)}">`).join('');
 }
@@ -812,6 +866,33 @@ function addSubtarea(){
 }
 
 // ══ GRUPOS ═══════════════════════════════════════════════════════
+function openModalConGrupo(grupo, subgrupo){
+  openModal(null);
+  if(grupo) document.getElementById('f-grupo').value = grupo;
+  if(subgrupo) document.getElementById('f-subgrupo').value = subgrupo;
+  else document.getElementById('f-subgrupo').value = '';
+  updateSubgruposList();
+}
+
+// ── MOVER SUBGRUPOS ──────────────────────────────────────────
+function moveSgrp(grupo, sgrp, dir){
+  const todosSubgrupos=[...new Set(data.tasks.filter(t=>t.grupo===grupo).map(t=>t.subgrupo).filter(Boolean))];
+  if(!data.sgrupoOrder) data.sgrupoOrder={};
+  if(!data.sgrupoOrder[grupo] || data.sgrupoOrder[grupo].length < todosSubgrupos.length){
+    data.sgrupoOrder[grupo]=[...todosSubgrupos];
+  }
+  const order=data.sgrupoOrder[grupo];
+  todosSubgrupos.forEach(s=>{ if(!order.includes(s)) order.push(s); });
+  const idx=order.indexOf(sgrp);
+  if(idx<0) return;
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=order.length) return;
+  order.splice(idx,1);
+  order.splice(newIdx,0,sgrp);
+  saveToDrive();
+  render();
+}
+
 function addGrupo(){ const n=prompt('Nombre del grupo:'); if(!n?.trim())return; openModal({grupo:n.trim()}); }
 function addSubgrupo(g){ const n=prompt(`Nombre del subgrupo en "${g}":`); if(!n?.trim())return; openModal({grupo:g,subgrupo:n.trim()}); }
 
@@ -823,9 +904,127 @@ function addPersona(){ const v=document.getElementById('nueva-persona').value.tr
 function deletePersona(n){ if(!confirm(`¿Eliminar a "${n}"?`))return; data.personas=data.personas.filter(p=>p!==n); renderPersonasList(); saveToDrive(); render(); }
 
 // ══ MOBILE FILTER ════════════════════════════════════════════════
+function toggleFblock(titleEl){
+  const body = titleEl.nextElementSibling;
+  const arrow = titleEl.querySelector('.fblock-arrow');
+  body.classList.toggle('collapsed');
+  if(arrow) arrow.style.transform = body.classList.contains('collapsed') ? 'rotate(-90deg)' : '';
+}
+
 function toggleMobFilter(){ const p=document.getElementById('mob-filter-panel'); const a=document.getElementById('mob-filter-arrow'); const o=p.classList.toggle('open'); a.style.transform=o?'rotate(180deg)':''; }
 
+function renderActiveChips(){
+  const bar=document.getElementById('active-chips-bar');
+  if(!bar)return;
+  const isMob=window.innerWidth<=768;
+  if(!isMob){bar.style.display='none';return;}
+  const chips=[];
+  const labels={responsable:filters.responsable,estado:filters.estado,prioridad:filters.prioridad,inicio:filters.inicio==='iniciada'?'Ya iniciadas':filters.inicio==='no_iniciada'?'No iniciadas':''};
+  Object.entries(labels).forEach(([k,v])=>{ if(v) chips.push(`<div class="active-chip">${v} <span class="active-chip-x" onclick="clearOneFilter('${k}')">✕</span></div>`); });
+  const desde=document.getElementById('mob-desde')?.value;
+  const hasta=document.getElementById('mob-hasta')?.value;
+  if(desde||hasta){
+    const label=(desde&&hasta)?`${fmt(desde)}-${fmt(hasta)}`:desde?`Desde ${fmt(desde)}`:`Hasta ${fmt(hasta)}`;
+    chips.push(`<div class="active-chip">${label} <span class="active-chip-x" onclick="clearDateFilter()">✕</span></div>`);
+  }
+  if(chips.length>0){ bar.style.display='flex'; bar.innerHTML=chips.join(''); }
+  else{ bar.style.display='none'; bar.innerHTML=''; }
+  // Actualizar contador en botón filtros
+  const cnt=document.getElementById('mob-filter-count');
+  if(cnt){ if(chips.length>0){cnt.style.display='inline';cnt.textContent=chips.length;}else{cnt.style.display='none';} }
+}
+
+function clearOneFilter(key){
+  filters[key]='';
+  // Reset chip en panel
+  const panels={responsable:'mob-resp-chips',estado:null,prioridad:null,inicio:null};
+  document.querySelectorAll('.mob-filter-panel .fp-chips').forEach(fc=>{
+    const firstChip=fc.querySelector('.chip');
+    if(firstChip){ fc.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); firstChip.classList.add('active'); }
+  });
+  render();
+}
+
+function clearDateFilter(){
+  const d=document.getElementById('mob-desde'); if(d)d.value='';
+  const h=document.getElementById('mob-hasta'); if(h)h.value='';
+  render();
+}
+
 // ══ DRAG & DROP ══════════════════════════════════════════════════
+// ── DRAG GRUPOS ──────────────────────────────────────────────
+let dragGrupoName = null;
+// Orden personalizado de grupos
+if(!data.grupoOrder) data.grupoOrder = [];
+
+function dragGrupoStart(e, nombre){
+  dragGrupoName = nombre;
+  e.stopPropagation();
+  e.dataTransfer.effectAllowed = 'move';
+}
+function dragGrupoOver(e){
+  e.preventDefault();
+  e.stopPropagation();
+  e.currentTarget.classList.add('drag-over');
+}
+function dragGrupoDrop(e, targetNombre){
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelectorAll('.grupo').forEach(g=>g.classList.remove('drag-over'));
+  if(!dragGrupoName || dragGrupoName === targetNombre) return;
+  // Mover todas las tareas del grupo arrastrado al orden correcto
+  const grupos = [...new Set(data.tasks.map(t=>t.grupo).filter(Boolean))];
+  if(!data.grupoOrder.length) data.grupoOrder = grupos;
+  const from = data.grupoOrder.indexOf(dragGrupoName);
+  const to = data.grupoOrder.indexOf(targetNombre);
+  if(from>=0 && to>=0){
+    data.grupoOrder.splice(from,1);
+    data.grupoOrder.splice(to,0,dragGrupoName);
+  }
+  dragGrupoName = null;
+  render();
+}
+
+// ── DRAG SUBGRUPOS ───────────────────────────────────────────
+if(!data.sgrupoOrder) data.sgrupoOrder = {};
+let dragSgrpData = null;
+
+function dragSgrpStart(e, grupo, sgrp){
+  dragSgrpData = {grupo, sgrp};
+  e.stopPropagation();
+  e.dataTransfer.effectAllowed = 'move';
+}
+function dragSgrpOver(e){
+  e.preventDefault();
+  e.stopPropagation();
+  e.currentTarget.classList.add('drag-over-sub');
+}
+function dragSgrpDrop(e, targetGrupo, targetSgrp){
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelectorAll('.subgrupo').forEach(s=>s.classList.remove('drag-over-sub'));
+  if(!dragSgrpData || dragSgrpData.sgrp === targetSgrp) return;
+  if(dragSgrpData.grupo !== targetGrupo) return; // solo mismo grupo
+  const g = targetGrupo;
+  // Inicializar con TODOS los subgrupos actuales del grupo en orden actual
+  const todosSubgrupos = [...new Set(data.tasks.filter(t=>t.grupo===g).map(t=>t.subgrupo).filter(Boolean))];
+  if(!data.sgrupoOrder[g] || data.sgrupoOrder[g].length !== todosSubgrupos.length){
+    data.sgrupoOrder[g] = todosSubgrupos;
+  }
+  const order = data.sgrupoOrder[g];
+  // Asegurar que ambos están en el array
+  if(!order.includes(dragSgrpData.sgrp)) order.push(dragSgrpData.sgrp);
+  if(!order.includes(targetSgrp)) order.push(targetSgrp);
+  const from = order.indexOf(dragSgrpData.sgrp);
+  const to = order.indexOf(targetSgrp);
+  order.splice(from, 1);
+  order.splice(to, 0, dragSgrpData.sgrp);
+  dragSgrpData = null;
+  saveToDrive();
+  render();
+}
+
+// ── DRAG TAREAS ──────────────────────────────────────────────
 function dragStart(e,id){ dragId=id; e.dataTransfer.effectAllowed='move'; }
 function dragOver(e){ e.preventDefault(); }
 function drop(e,targetId){ e.preventDefault(); if(!dragId||dragId===targetId)return; const fi=data.tasks.findIndex(t=>t.id===dragId); const ti=data.tasks.findIndex(t=>t.id===targetId); const[m]=data.tasks.splice(fi,1); m.grupo=data.tasks[ti]?.grupo||null; m.subgrupo=data.tasks[ti]?.subgrupo||null; data.tasks.splice(ti,0,m); dragId=null; saveToDrive(); render(); showToast('Tarea movida'); }
