@@ -734,7 +734,14 @@ function renderGroups(){
     const gName=g==='__sg__'?null:g;
     const total=list.filter(t=>(t.grupo||'__sg__')===g).length;
     let sgHtml='';
-    Object.keys(gm[g]).sort((a,b)=>a==='__ss__'?1:b==='__ss__'?-1:a.localeCompare(b)).forEach(s=>{
+    const sgrpOrder = (gName && data.sgrupoOrder && data.sgrupoOrder[gName]) || [];
+    Object.keys(gm[g]).sort((a,b)=>{
+      if(a==='__ss__') return 1; if(b==='__ss__') return -1;
+      const ai=sgrpOrder.indexOf(a); const bi=sgrpOrder.indexOf(b);
+      if(ai>=0&&bi>=0) return ai-bi;
+      if(ai>=0) return -1; if(bi>=0) return 1;
+      return a.localeCompare(b);
+    }).forEach(s=>{
       const sName=s==='__ss__'?null:s;
       const tasks=gm[g][s];
       if(!tasks.length)return;
