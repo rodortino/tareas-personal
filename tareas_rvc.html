@@ -587,7 +587,7 @@ async function loadFromDrive(){
       driveFileId=r.result.files[0].id;
       const res=await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,{headers:{Authorization:`Bearer ${accessToken}`}});
       data=await res.json();
-      if(!data.tasks)data.tasks=[]; if(!data.personas)data.personas=[];
+      if(!data.tasks)data.tasks=[]; if(!data.personas)data.personas=[]; if(!data.grupoOrder)data.grupoOrder=[]; if(!data.sgrupoOrder)data.sgrupoOrder={};
     } else { data={tasks:[],personas:[]}; }
     setSyncStatus('ok','Sincronizado'); render();
   }catch(e){ setSyncStatus('error','Error de sincronización'); data={tasks:[],personas:[]}; render(); }
@@ -722,7 +722,7 @@ function renderGroups(){
   const allGrupoKeys = Object.keys(gm);
   allGrupoKeys.sort((a,b)=>{
     if(a==='__sg__') return 1; if(b==='__sg__') return -1;
-    const oi = window.grupoOrder||[];
+    const oi = data.grupoOrder||[];
     const ai = oi.indexOf(a); const bi = oi.indexOf(b);
     if(ai>=0 && bi>=0) return ai-bi;
     if(ai>=0) return -1; if(bi>=0) return 1;
@@ -927,7 +927,7 @@ function clearDateFilter(){
 // ── DRAG GRUPOS ──────────────────────────────────────────────
 let dragGrupoName = null;
 // Orden personalizado de grupos
-if(!window.grupoOrder) window.grupoOrder = [];
+if(!data.grupoOrder) data.grupoOrder = [];
 
 function dragGrupoStart(e, nombre){
   dragGrupoName = nombre;
@@ -946,19 +946,19 @@ function dragGrupoDrop(e, targetNombre){
   if(!dragGrupoName || dragGrupoName === targetNombre) return;
   // Mover todas las tareas del grupo arrastrado al orden correcto
   const grupos = [...new Set(data.tasks.map(t=>t.grupo).filter(Boolean))];
-  if(!window.grupoOrder.length) window.grupoOrder = grupos;
-  const from = window.grupoOrder.indexOf(dragGrupoName);
-  const to = window.grupoOrder.indexOf(targetNombre);
+  if(!data.grupoOrder.length) data.grupoOrder = grupos;
+  const from = data.grupoOrder.indexOf(dragGrupoName);
+  const to = data.grupoOrder.indexOf(targetNombre);
   if(from>=0 && to>=0){
-    window.grupoOrder.splice(from,1);
-    window.grupoOrder.splice(to,0,dragGrupoName);
+    data.grupoOrder.splice(from,1);
+    data.grupoOrder.splice(to,0,dragGrupoName);
   }
   dragGrupoName = null;
   render();
 }
 
 // ── DRAG SUBGRUPOS ───────────────────────────────────────────
-if(!window.sgrupoOrder) window.sgrupoOrder = {};
+if(!data.sgrupoOrder) data.sgrupoOrder = {};
 let dragSgrpData = null;
 
 function dragSgrpStart(e, grupo, sgrp){
@@ -980,10 +980,10 @@ function dragSgrpDrop(e, targetGrupo, targetSgrp){
   const g = targetGrupo;
   // Inicializar con TODOS los subgrupos actuales del grupo en orden actual
   const todosSubgrupos = [...new Set(data.tasks.filter(t=>t.grupo===g).map(t=>t.subgrupo).filter(Boolean))];
-  if(!window.sgrupoOrder[g] || window.sgrupoOrder[g].length !== todosSubgrupos.length){
-    window.sgrupoOrder[g] = todosSubgrupos;
+  if(!data.sgrupoOrder[g] || data.sgrupoOrder[g].length !== todosSubgrupos.length){
+    data.sgrupoOrder[g] = todosSubgrupos;
   }
-  const order = window.sgrupoOrder[g];
+  const order = data.sgrupoOrder[g];
   // Asegurar que ambos están en el array
   if(!order.includes(dragSgrpData.sgrp)) order.push(dragSgrpData.sgrp);
   if(!order.includes(targetSgrp)) order.push(targetSgrp);
@@ -992,6 +992,7 @@ function dragSgrpDrop(e, targetGrupo, targetSgrp){
   order.splice(from, 1);
   order.splice(to, 0, dragSgrpData.sgrp);
   dragSgrpData = null;
+  saveToDrive();
   render();
 }
 
