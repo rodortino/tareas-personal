@@ -381,7 +381,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="frow">
       <div class="fg">
         <label class="fl">Grupo</label>
-        <input class="fi" id="f-grupo" placeholder="Escribe o elige..." list="grupos-list" autocomplete="off">
+        <input class="fi" id="f-grupo" placeholder="Escribe o elige..." list="grupos-list" autocomplete="off" oninput="onGrupoChange()" onchange="onGrupoChange()">
         <datalist id="grupos-list"></datalist>
       </div>
       <div class="fg">
@@ -715,9 +715,8 @@ function openModal(task){
   // Datalists con grupos existentes
   const grupos=[...new Set(data.tasks.map(t=>t.grupo).filter(Boolean))];
   document.getElementById('grupos-list').innerHTML=grupos.map(g=>`<option value="${esc(g)}">`).join('');
-  // Subgrupos asociados al grupo seleccionado
+  // Subgrupos del grupo seleccionado
   updateSubgruposList();
-  document.getElementById('f-grupo').oninput=function(){ updateSubgruposList(); };
   // Subtareas
   tempSubtareas=JSON.parse(JSON.stringify(task?.subtareas||[]));
   renderSubtareasList();
@@ -737,6 +736,12 @@ function saveTask(){
 }
 
 // ══ SUBGRUPOS ASOCIADOS ══════════════════════════════════════════
+function onGrupoChange(){
+  updateSubgruposList();
+  // Limpiar subgrupo si el grupo cambió
+  document.getElementById('f-subgrupo').value='';
+}
+
 function updateSubgruposList(){
   const grupoActual=document.getElementById('f-grupo').value.trim();
   let subgrupos;
