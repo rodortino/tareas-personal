@@ -62,7 +62,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .search-bar{padding:10px 20px 6px;flex-shrink:0}
   .groups-wrap{padding:0 20px 60px;flex:1}
   /* Global col header for desktop */
-  .global-col-hdr{display:grid;grid-template-columns:28px 22px 1fr 100px 110px 78px 92px 92px;gap:0;padding:6px 12px 6px 26px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border);position:sticky;top:0;z-index:5;margin:0 0 0 0}
+  .global-col-hdr{display:grid;grid-template-columns:28px 22px 1fr 100px 110px 78px 92px 92px;gap:0;padding:6px 12px 6px 26px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border)}
   .trow{display:grid;grid-template-columns:28px 22px 1fr 100px 110px 78px 92px 92px;gap:0;padding:8px 12px 8px 26px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
   .trow:hover{background:#FAFAF8}
 }
@@ -75,7 +75,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .action-bar.active{background:#0f2d4a}
   .search-bar{padding:8px 14px 4px;flex-shrink:0}
   .groups-wrap{padding:0 14px 80px;flex:1}
-  .global-col-hdr{display:grid;grid-template-columns:26px 22px 1fr auto;gap:0;padding:6px 12px 6px 22px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border);position:sticky;top:0;z-index:5}
+  .global-col-hdr{display:grid;grid-template-columns:26px 22px 1fr auto;gap:0;padding:6px 12px 6px 22px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border)}
   .trow{display:grid;grid-template-columns:26px 22px 1fr auto;gap:0;padding:9px 12px 9px 22px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
   .trow:active{background:#FAFAF8}
   .mob-filter-toggle{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-bottom:1px solid var(--border);padding:11px 14px;cursor:pointer;min-height:var(--touch);flex-shrink:0}
@@ -193,7 +193,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .seg{display:grid;grid-template-columns:1fr 1fr 1fr;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;background:var(--bg)}
 .segbtn{padding:11px 6px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;font-family:'DM Sans',sans-serif;color:var(--text2);min-height:44px}
 .segbtn+.segbtn{border-left:1px solid var(--border)}
-.segbtn.sa{background:var(--red-l);color:var(--red)}.segbtn.sm{background:var(--amber-l);color:var(--amber)}.segbtn.sb{background:var(--green-l);color:var(--green)}
+.segbtn.sa{background:#E8847B;color:#fff}.segbtn.sm{background:#D4933A;color:#fff}.segbtn.sb{background:#4A9068;color:#fff}
 .modal-btns{display:flex;gap:10px;margin-top:18px}
 @media(max-width:768px){.modal-btns{flex-direction:column;gap:8px}}
 .btn{flex:1;padding:13px;border-radius:12px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;border:none;min-height:44px}
@@ -366,10 +366,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         </div>
       </div>
 
-      <!-- Global column header -->
-      <div class="global-col-hdr" id="global-col-hdr" style="display:none"></div>
-
-      <!-- Groups -->
+      <!-- Groups (col header is injected inside by JS) -->
       <div class="groups-wrap" id="groups-wrap"></div>
     </div>
   </div>
@@ -641,24 +638,17 @@ function renderResponsableFilters(){
 
 function renderGroups(){
   const list=getFiltered(); const wrap=document.getElementById('groups-wrap'); const isMob=window.innerWidth<=768;
-  // Build group/subgroup map using only ALL tasks for structure, but filtered tasks for content
   const gm={};
-  // Only create structure for groups that have filtered tasks
   list.forEach(t=>{ const g=t.grupo||'__sg__'; const s=t.subgrupo||'__ss__'; if(!gm[g])gm[g]={}; if(!gm[g][s])gm[g][s]=[]; gm[g][s].push(t); });
-
-  // Sort tasks
   Object.keys(gm).forEach(g=>Object.keys(gm[g]).forEach(s=>{ gm[g][s].sort((a,b)=>{ const p={Alta:0,Media:1,Baja:2}; if(p[a.prioridad]!==p[b.prioridad])return p[a.prioridad]-p[b.prioridad]; if(a.limite&&b.limite)return a.limite.localeCompare(b.limite); if(a.limite)return -1; if(b.limite)return 1; return 0; }); }));
 
-  // Show global col header only if there are tasks
-  const gColHdr=document.getElementById('global-col-hdr');
-  if(list.length>0){
-    gColHdr.style.display='grid';
-    if(isMob){ gColHdr.innerHTML=`<span></span><span></span><span>Título / Detalle</span><div style="display:flex;justify-content:flex-end"><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text2);text-transform:uppercase">Inicio</span><span style="min-width:8px"></span><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text2);text-transform:uppercase">Límite</span></div>`; }
-    else{ gColHdr.innerHTML=`<span></span><span></span><span>Título</span><span>Responsable</span><span>Estado</span><span>Prioridad</span><span>F. inicio</span><span>F. límite</span>`; }
-  } else { gColHdr.style.display='none'; }
+  // Header global de columnas — sticky arriba dentro del scroll
+  const colHdrHtml = list.length===0 ? '' : isMob
+    ? `<div class="global-col-hdr" style="position:sticky;top:0;z-index:5"><span></span><span></span><span>Título / Detalle</span><div style="display:flex;justify-content:flex-end"><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text2);text-transform:uppercase">Inicio</span><span style="min-width:8px"></span><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text2);text-transform:uppercase">Límite</span></div></div>`
+    : `<div class="global-col-hdr" style="position:sticky;top:0;z-index:5"><span></span><span></span><span>Título</span><span>Responsable</span><span>Estado</span><span>Prioridad</span><span>F. inicio</span><span>F. límite</span></div>`;
 
   if(Object.keys(gm).length===0){
-    wrap.innerHTML=`<div style="text-align:center;padding:48px 20px;color:var(--text3);font-size:14px">Sin tareas que coincidan con los filtros</div><div class="add-grupo" onclick="addGrupo()"><span style="font-size:18px">+</span> Nuevo grupo</div>`;
+    wrap.innerHTML=`${colHdrHtml}<div style="text-align:center;padding:48px 20px;color:var(--text3);font-size:14px">Sin tareas que coincidan con los filtros</div><div class="add-grupo" onclick="addGrupo()"><span style="font-size:18px">+</span> Nuevo grupo</div>`;
     return;
   }
 
@@ -680,7 +670,7 @@ function renderGroups(){
     else html+=`<div class="grupo" style="border-style:dashed"><div class="grp-hdr" onclick="toggleGrp(this)" style="background:transparent"><span class="grp-arrow">▾</span><span style="font-size:15px">📄</span><span class="grp-name" style="color:var(--text3);font-style:italic">Sin grupo</span><span class="grp-cnt">${total}</span></div><div class="grp-body">${sgHtml}</div></div>`;
   });
   html+=`<div class="add-grupo" onclick="addGrupo()"><span style="font-size:18px">+</span> Nuevo grupo</div>`;
-  wrap.innerHTML=html;
+  wrap.innerHTML=colHdrHtml+html;
   restoreCollapsed();
 }
 
@@ -722,11 +712,12 @@ function openModal(task){
   setPrio(task?.prioridad||'Alta');
   const sel=document.getElementById('f-resp');
   sel.innerHTML='<option value="">Sin asignar</option>'+data.personas.map(p=>`<option${task?.responsable===p?' selected':''}>${esc(p)}</option>`).join('');
-  // Datalists con grupos y subgrupos existentes
+  // Datalists con grupos existentes
   const grupos=[...new Set(data.tasks.map(t=>t.grupo).filter(Boolean))];
   document.getElementById('grupos-list').innerHTML=grupos.map(g=>`<option value="${esc(g)}">`).join('');
-  const subgrupos=[...new Set(data.tasks.map(t=>t.subgrupo).filter(Boolean))];
-  document.getElementById('subgrupos-list').innerHTML=subgrupos.map(s=>`<option value="${esc(s)}">`).join('');
+  // Subgrupos asociados al grupo seleccionado
+  updateSubgruposList();
+  document.getElementById('f-grupo').oninput=function(){ updateSubgruposList(); };
   // Subtareas
   tempSubtareas=JSON.parse(JSON.stringify(task?.subtareas||[]));
   renderSubtareasList();
@@ -743,6 +734,18 @@ function saveTask(){
   const t={ id:editId||uid(), titulo, grupo:document.getElementById('f-grupo').value.trim()||null, subgrupo:document.getElementById('f-subgrupo').value.trim()||null, responsable:document.getElementById('f-resp').value||null, inicio:document.getElementById('f-inicio').value||null, limite:document.getElementById('f-limite').value||null, prioridad:selPrio, estado:document.getElementById('f-estado').value, notas:document.getElementById('f-notas').value.trim()||null, subtareas:tempSubtareas, creado:editId?(data.tasks.find(x=>x.id===editId)?.creado||today()):today() };
   if(editId){ const i=data.tasks.findIndex(x=>x.id===editId); data.tasks[i]=t; }else data.tasks.unshift(t);
   saveToDrive(); closeModal(); render(); showToast(editId?'Tarea actualizada':'Tarea creada');
+}
+
+// ══ SUBGRUPOS ASOCIADOS ══════════════════════════════════════════
+function updateSubgruposList(){
+  const grupoActual=document.getElementById('f-grupo').value.trim();
+  let subgrupos;
+  if(grupoActual){
+    subgrupos=[...new Set(data.tasks.filter(t=>t.grupo===grupoActual).map(t=>t.subgrupo).filter(Boolean))];
+  } else {
+    subgrupos=[...new Set(data.tasks.map(t=>t.subgrupo).filter(Boolean))];
+  }
+  document.getElementById('subgrupos-list').innerHTML=subgrupos.map(s=>`<option value="${esc(s)}">`).join('');
 }
 
 // ══ SUBTAREAS ════════════════════════════════════════════════════
