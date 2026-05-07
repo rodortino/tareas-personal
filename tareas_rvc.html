@@ -58,12 +58,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .mob-only{display:none!important}
   .layout{display:flex;flex:1;overflow:hidden;min-height:0}
   .sidebar{width:225px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
-  .content{flex:1;overflow-y:auto;min-width:0;display:flex;flex-direction:column}
+  .content{flex:1;overflow-y:hidden;min-width:0;display:flex;flex-direction:column}
   .action-bar{padding:8px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;min-height:44px;background:var(--surface);flex-shrink:0;transition:background .2s}
   .action-bar.active{background:#8B1A1A}
 .action-bar-wrap{position:sticky;top:0;z-index:50;flex-shrink:0}
-  .search-bar{padding:10px 20px 6px;flex-shrink:0}
-  .groups-wrap{padding:0 20px 60px;flex:1}
+  .search-bar{padding:10px 20px 6px;flex-shrink:0;background:var(--bg)}
+  .groups-wrap{padding:0 20px 60px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
   /* Global col header for desktop */
   .global-col-hdr{display:grid;grid-template-columns:28px 1fr 100px 110px 78px 92px 92px;gap:0;padding:6px 12px 6px 26px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border)}
   .trow{display:grid;grid-template-columns:28px 1fr 100px 110px 78px 92px 92px;gap:0;padding:8px 12px 8px 26px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
@@ -73,12 +73,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .desk-only{display:none!important}
   .layout{display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0}
   .sidebar{display:none}
-  .content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+  .content{flex:1;overflow-y:hidden;display:flex;flex-direction:column}
   .action-bar{padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;min-height:44px;background:var(--surface);flex-shrink:0;transition:background .2s}
   .action-bar.active{background:#8B1A1A}
 .action-bar-wrap{position:sticky;top:0;z-index:50;flex-shrink:0}
-  .search-bar{padding:8px 14px 4px;flex-shrink:0}
-  .groups-wrap{padding:0 14px 80px;flex:1}
+  .search-bar{padding:8px 14px 4px;flex-shrink:0;background:var(--bg)}
+  .groups-wrap{padding:0 14px 80px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
   .global-col-hdr{display:grid;grid-template-columns:26px 1fr auto;gap:0;padding:6px 12px 6px 22px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border)}
   .trow{display:grid;grid-template-columns:26px 1fr auto;gap:0;padding:9px 12px 9px 22px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
   .trow:active{background:#FAFAF8}
@@ -134,6 +134,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .mob-date-val.v{color:var(--red);font-weight:600}.mob-date-val.h{color:var(--amber);font-weight:600}
 .mob-date-sep{color:var(--border);font-size:10px}
 .mob-badges{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+
+/* Filtros colapsables sidebar */
+.fblock-toggle{cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.fblock-toggle:hover{color:var(--text)}
+.fblock-arrow{font-size:10px;transition:transform .2s;color:var(--text3)}
+.fblock-body{overflow:hidden;transition:max-height .2s ease}
+.fblock-body.collapsed{display:none}
+/* Drag grupos */
+.grupo.drag-over{border:2px dashed var(--accent);background:var(--accent-l)}
+.grp-hdr .drag-handle{cursor:grab;color:var(--text3);font-size:14px;padding:0 4px}
+.grp-hdr .drag-handle:active{cursor:grabbing}
+
 .grupo{margin-bottom:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
 .grp-hdr{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--surface2);cursor:pointer;user-select:none;transition:background .12s}
 .grp-hdr:hover,.grp-hdr:active{background:#E8E4DC}
@@ -289,32 +301,40 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="sb-manage" onclick="openPersonasModal()">⚙ Administrar personas</div>
       </div>
       <div class="fblock">
-        <div class="fblock-title">Estado</div>
-        <div class="fopt active" onclick="sbFilter('estado','',this)"><span>Todos</span><span class="fcnt" id="cnt-est-all">0</span></div>
-        <div class="fopt" onclick="sbFilter('estado','Activa',this)"><span>▶ Activas</span><span class="fcnt" id="cnt-est-act">0</span></div>
-        <div class="fopt" onclick="sbFilter('estado','Pendiente',this)"><span>⬜ Pendiente</span><span class="fcnt" id="cnt-est-pend">0</span></div>
-        <div class="fopt" onclick="sbFilter('estado','En progreso',this)"><span>🔵 En progreso</span><span class="fcnt" id="cnt-est-prog">0</span></div>
-        <div class="fopt" onclick="sbFilter('estado','Completada',this)"><span>✅ Completada</span><span class="fcnt" id="cnt-est-comp">0</span></div>
-        <div class="fopt" style="color:var(--red)" onclick="sbFilter('estado','Vencida',this)"><span>⚠ Vencidas</span><span class="fcnt" id="cnt-est-venc">0</span></div>
+        <div class="fblock-title fblock-toggle" onclick="toggleFblock(this)">Estado <span class="fblock-arrow">▾</span></div>
+        <div class="fblock-body">
+          <div class="fopt active" onclick="sbFilter('estado','',this)"><span>Todos</span><span class="fcnt" id="cnt-est-all">0</span></div>
+          <div class="fopt" onclick="sbFilter('estado','Activa',this)"><span>▶ Activas</span><span class="fcnt" id="cnt-est-act">0</span></div>
+          <div class="fopt" onclick="sbFilter('estado','Pendiente',this)"><span>⬜ Pendiente</span><span class="fcnt" id="cnt-est-pend">0</span></div>
+          <div class="fopt" onclick="sbFilter('estado','En progreso',this)"><span>🔵 En progreso</span><span class="fcnt" id="cnt-est-prog">0</span></div>
+          <div class="fopt" onclick="sbFilter('estado','Completada',this)"><span>✅ Completada</span><span class="fcnt" id="cnt-est-comp">0</span></div>
+          <div class="fopt" style="color:var(--red)" onclick="sbFilter('estado','Vencida',this)"><span>⚠ Vencidas</span><span class="fcnt" id="cnt-est-venc">0</span></div>
+        </div>
       </div>
       <div class="fblock">
-        <div class="fblock-title">Prioridad</div>
-        <div class="fopt active" onclick="sbFilter('prioridad','',this)"><span>Todas</span><span class="fcnt" id="cnt-prio-all">0</span></div>
-        <div class="fopt" onclick="sbFilter('prioridad','Alta',this)"><span>🔴 Alta</span><span class="fcnt" id="cnt-prio-alta">0</span></div>
-        <div class="fopt" onclick="sbFilter('prioridad','Media',this)"><span>🟡 Media</span><span class="fcnt" id="cnt-prio-media">0</span></div>
-        <div class="fopt" onclick="sbFilter('prioridad','Baja',this)"><span>🟢 Baja</span><span class="fcnt" id="cnt-prio-baja">0</span></div>
+        <div class="fblock-title fblock-toggle" onclick="toggleFblock(this)">Prioridad <span class="fblock-arrow">▾</span></div>
+        <div class="fblock-body">
+          <div class="fopt active" onclick="sbFilter('prioridad','',this)"><span>Todas</span><span class="fcnt" id="cnt-prio-all">0</span></div>
+          <div class="fopt" onclick="sbFilter('prioridad','Alta',this)"><span>🔴 Alta</span><span class="fcnt" id="cnt-prio-alta">0</span></div>
+          <div class="fopt" onclick="sbFilter('prioridad','Media',this)"><span>🟡 Media</span><span class="fcnt" id="cnt-prio-media">0</span></div>
+          <div class="fopt" onclick="sbFilter('prioridad','Baja',this)"><span>🟢 Baja</span><span class="fcnt" id="cnt-prio-baja">0</span></div>
+        </div>
       </div>
       <div class="fblock">
-        <div class="fblock-title">Fecha inicio</div>
-        <div class="fopt active" onclick="sbFilter('inicio','',this)"><span>Todas</span></div>
-        <div class="fopt" onclick="sbFilter('inicio','iniciada',this)"><span>▶ Ya iniciadas</span></div>
-        <div class="fopt" onclick="sbFilter('inicio','no_iniciada',this)"><span>⏳ No iniciadas</span></div>
+        <div class="fblock-title fblock-toggle" onclick="toggleFblock(this)">Fecha inicio <span class="fblock-arrow">▾</span></div>
+        <div class="fblock-body">
+          <div class="fopt active" onclick="sbFilter('inicio','',this)"><span>Todas</span></div>
+          <div class="fopt" onclick="sbFilter('inicio','iniciada',this)"><span>▶ Ya iniciadas</span></div>
+          <div class="fopt" onclick="sbFilter('inicio','no_iniciada',this)"><span>⏳ No iniciadas</span></div>
+        </div>
       </div>
       <div class="fblock">
-        <div class="fblock-title">Fecha límite</div>
-        <div class="fdate-row"><div class="fdate-lbl">Desde</div><input class="fdate-input" type="date" id="sb-desde" onchange="render()"></div>
-        <div class="fdate-row"><div class="fdate-lbl">Hasta</div><input class="fdate-input" type="date" id="sb-hasta" onchange="render()"></div>
-        <span class="fclear" onclick="document.getElementById('sb-desde').value='';document.getElementById('sb-hasta').value='';render()">✕ Limpiar rango</span>
+        <div class="fblock-title fblock-toggle" onclick="toggleFblock(this)">Fecha límite <span class="fblock-arrow">▾</span></div>
+        <div class="fblock-body">
+          <div class="fdate-row"><div class="fdate-lbl">Desde</div><input class="fdate-input" type="date" id="sb-desde" onchange="render()"></div>
+          <div class="fdate-row"><div class="fdate-lbl">Hasta</div><input class="fdate-input" type="date" id="sb-hasta" onchange="render()"></div>
+          <span class="fclear" onclick="document.getElementById('sb-desde').value='';document.getElementById('sb-hasta').value='';render()">✕ Limpiar rango</span>
+        </div>
       </div>
       <button class="clear-filters-btn" onclick="clearAllFilters()">✕ Limpiar todos los filtros</button>
     </div>
@@ -695,7 +715,17 @@ function renderGroups(){
   }
 
   let html='';
-  Object.keys(gm).sort((a,b)=>a==='__sg__'?1:b==='__sg__'?-1:a.localeCompare(b)).forEach(g=>{
+  // Ordenar grupos: primero según grupoOrder si existe, luego alfabético
+  const allGrupoKeys = Object.keys(gm);
+  allGrupoKeys.sort((a,b)=>{
+    if(a==='__sg__') return 1; if(b==='__sg__') return -1;
+    const oi = window.grupoOrder||[];
+    const ai = oi.indexOf(a); const bi = oi.indexOf(b);
+    if(ai>=0 && bi>=0) return ai-bi;
+    if(ai>=0) return -1; if(bi>=0) return 1;
+    return a.localeCompare(b);
+  });
+  allGrupoKeys.forEach(g=>{
     const gName=g==='__sg__'?null:g;
     const total=list.filter(t=>(t.grupo||'__sg__')===g).length;
     let sgHtml='';
@@ -708,7 +738,7 @@ function renderGroups(){
       else sgHtml+=`<div class="subgrupo" style="border-top:${gName?'1px solid var(--border)':'none'}"><div class="sgrp-body"><div>${rows}</div></div></div>`;
     });
     if(!sgHtml)return;
-    if(gName) html+=`<div class="grupo"><div class="grp-hdr" onclick="toggleGrp(this)"><span class="grp-arrow">▾</span><span style="font-size:15px">📁</span><span class="grp-name">${esc(gName)}</span><span class="grp-cnt">${total}</span><span class="grp-add desk-only" onclick="event.stopPropagation();addSubgrupo('${esc(gName)}')">+ Subgrupo</span></div><div class="grp-body">${sgHtml}</div></div>`;
+    if(gName) html+=`<div class="grupo" draggable="true" data-grupo="${esc(gName)}" ondragstart="dragGrupoStart(event,'${esc(gName)}')" ondragover="dragGrupoOver(event)" ondrop="dragGrupoDrop(event,'${esc(gName)}')"><div class="grp-hdr" onclick="toggleGrp(this)"><span class="drag-handle" onclick="event.stopPropagation()" title="Arrastrar para reordenar">⠿</span><span class="grp-arrow">▾</span><span style="font-size:15px">📁</span><span class="grp-name">${esc(gName)}</span><span class="grp-cnt">${total}</span><span class="grp-add desk-only" onclick="event.stopPropagation();addSubgrupo('${esc(gName)}')">+ Subgrupo</span></div><div class="grp-body">${sgHtml}</div></div>`;
     else html+=`<div class="grupo" style="border-style:dashed"><div class="grp-hdr" onclick="toggleGrp(this)" style="background:transparent"><span class="grp-arrow">▾</span><span style="font-size:15px">📄</span><span class="grp-name" style="color:var(--text3);font-style:italic">Sin grupo</span><span class="grp-cnt">${total}</span></div><div class="grp-body">${sgHtml}</div></div>`;
   });
   html+=`<div class="add-grupo" onclick="addGrupo()"><span style="font-size:18px">+</span> Nuevo grupo</div>`;
@@ -842,6 +872,13 @@ function addPersona(){ const v=document.getElementById('nueva-persona').value.tr
 function deletePersona(n){ if(!confirm(`¿Eliminar a "${n}"?`))return; data.personas=data.personas.filter(p=>p!==n); renderPersonasList(); saveToDrive(); render(); }
 
 // ══ MOBILE FILTER ════════════════════════════════════════════════
+function toggleFblock(titleEl){
+  const body = titleEl.nextElementSibling;
+  const arrow = titleEl.querySelector('.fblock-arrow');
+  body.classList.toggle('collapsed');
+  if(arrow) arrow.style.transform = body.classList.contains('collapsed') ? 'rotate(-90deg)' : '';
+}
+
 function toggleMobFilter(){ const p=document.getElementById('mob-filter-panel'); const a=document.getElementById('mob-filter-arrow'); const o=p.classList.toggle('open'); a.style.transform=o?'rotate(180deg)':''; }
 
 function renderActiveChips(){
@@ -883,6 +920,40 @@ function clearDateFilter(){
 }
 
 // ══ DRAG & DROP ══════════════════════════════════════════════════
+// ── DRAG GRUPOS ──────────────────────────────────────────────
+let dragGrupoName = null;
+// Orden personalizado de grupos
+if(!window.grupoOrder) window.grupoOrder = [];
+
+function dragGrupoStart(e, nombre){
+  dragGrupoName = nombre;
+  e.stopPropagation();
+  e.dataTransfer.effectAllowed = 'move';
+}
+function dragGrupoOver(e){
+  e.preventDefault();
+  e.stopPropagation();
+  e.currentTarget.classList.add('drag-over');
+}
+function dragGrupoDrop(e, targetNombre){
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelectorAll('.grupo').forEach(g=>g.classList.remove('drag-over'));
+  if(!dragGrupoName || dragGrupoName === targetNombre) return;
+  // Mover todas las tareas del grupo arrastrado al orden correcto
+  const grupos = [...new Set(data.tasks.map(t=>t.grupo).filter(Boolean))];
+  if(!window.grupoOrder.length) window.grupoOrder = grupos;
+  const from = window.grupoOrder.indexOf(dragGrupoName);
+  const to = window.grupoOrder.indexOf(targetNombre);
+  if(from>=0 && to>=0){
+    window.grupoOrder.splice(from,1);
+    window.grupoOrder.splice(to,0,dragGrupoName);
+  }
+  dragGrupoName = null;
+  render();
+}
+
+// ── DRAG TAREAS ──────────────────────────────────────────────
 function dragStart(e,id){ dragId=id; e.dataTransfer.effectAllowed='move'; }
 function dragOver(e){ e.preventDefault(); }
 function drop(e,targetId){ e.preventDefault(); if(!dragId||dragId===targetId)return; const fi=data.tasks.findIndex(t=>t.id===dragId); const ti=data.tasks.findIndex(t=>t.id===targetId); const[m]=data.tasks.splice(fi,1); m.grupo=data.tasks[ti]?.grupo||null; m.subgrupo=data.tasks[ti]?.subgrupo||null; data.tasks.splice(ti,0,m); dragId=null; saveToDrive(); render(); showToast('Tarea movida'); }
