@@ -59,8 +59,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .layout{display:flex;flex:1;overflow:hidden;min-height:0}
   .sidebar{width:225px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
   .content{flex:1;overflow-y:auto;min-width:0;display:flex;flex-direction:column}
-  .action-bar{padding:8px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;min-height:44px;background:var(--surface);flex-shrink:0;transition:background .2s;position:sticky;top:0;z-index:10}
+  .action-bar{padding:8px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;min-height:44px;background:var(--surface);flex-shrink:0;transition:background .2s}
   .action-bar.active{background:#8B1A1A}
+.action-bar-wrap{position:sticky;top:0;z-index:50;flex-shrink:0}
   .search-bar{padding:10px 20px 6px;flex-shrink:0}
   .groups-wrap{padding:0 20px 60px;flex:1}
   /* Global col header for desktop */
@@ -73,8 +74,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .layout{display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0}
   .sidebar{display:none}
   .content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
-  .action-bar{padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;min-height:44px;background:var(--surface);flex-shrink:0;transition:background .2s;position:sticky;top:0;z-index:10}
+  .action-bar{padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;min-height:44px;background:var(--surface);flex-shrink:0;transition:background .2s}
   .action-bar.active{background:#8B1A1A}
+.action-bar-wrap{position:sticky;top:0;z-index:50;flex-shrink:0}
   .search-bar{padding:8px 14px 4px;flex-shrink:0}
   .groups-wrap{padding:0 14px 80px;flex:1}
   .global-col-hdr{display:grid;grid-template-columns:26px 1fr auto;gap:0;padding:6px 12px 6px 22px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border)}
@@ -154,9 +156,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .stat{border-radius:8px;padding:9px 8px;text-align:center}
 .stat-num{font-size:20px;font-weight:600;letter-spacing:-1px;line-height:1}
 .stat-lbl{font-size:9px;font-weight:500;margin-top:3px}
-.fblock{padding:8px 12px 10px;border-bottom:1px solid var(--border)}
-.fblock-title{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
-.fopt{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--text2);transition:all .12s;user-select:none}
+.fblock{padding:6px 12px 8px;border-bottom:1px solid var(--border)}
+.fblock-title{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.fopt{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .12s;user-select:none}
 .fopt:hover{background:var(--surface2)}
 .fopt.active{background:var(--accent-l);color:var(--accent);font-weight:600}
 .fcnt{font-size:10px;padding:1px 6px;border-radius:8px;background:var(--surface2);color:var(--text3);font-weight:600}
@@ -319,6 +321,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
     <!-- CONTENT -->
     <div class="content">
+      <div class="action-bar-wrap">
       <div class="action-bar" id="action-bar">
         <span class="ab-hint">Selecciona tareas para ver acciones</span>
         <span class="ab-info" id="ab-info"></span>
@@ -370,6 +373,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
       <!-- Active filter chips -->
       <div class="active-chips-bar mob-only" id="active-chips-bar" style="display:none"></div>
+
+      </div><!-- /action-bar-wrap -->
 
       <!-- Search -->
       <div class="search-bar">
@@ -666,7 +671,7 @@ function updateStats(){
 }
 
 function renderResponsableFilters(){
-  const p=data.personas;
+  const p=[...data.personas].sort((a,b)=>a.localeCompare(b));
   const sbEl=document.getElementById('sb-responsables');
   if(sbEl) sbEl.innerHTML=`<div class="fopt ${!filters.responsable?'active':''}" onclick="sbFilter('responsable','',this)"><span>Todos</span><span class="fcnt">${data.tasks.length}</span></div>`+p.map(x=>{ const cnt=data.tasks.filter(t=>t.responsable===x).length; const[bg,cl]=avatarColor(x); return`<div class="fopt ${filters.responsable===x?'active':''}" onclick="sbFilter('responsable','${x}',this)"><span style="display:flex;align-items:center;gap:6px"><span class="p-avatar" style="background:${bg};color:${cl}">${initials(x)}</span>${x}</span><span class="fcnt">${cnt}</span></div>`; }).join('');
   const mobEl=document.getElementById('mob-resp-chips');
@@ -750,7 +755,7 @@ function openModal(task){
   const sel=document.getElementById('f-resp');
   sel.innerHTML='<option value="">Sin asignar</option>'+data.personas.map(p=>`<option${task?.responsable===p?' selected':''}>${esc(p)}</option>`).join('');
   // Datalists con grupos existentes
-  const grupos=[...new Set(data.tasks.map(t=>t.grupo).filter(Boolean))];
+  const grupos=[...new Set(data.tasks.map(t=>t.grupo).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
   document.getElementById('grupos-list').innerHTML=grupos.map(g=>`<option value="${esc(g)}">`).join('');
   // Subgrupos del grupo seleccionado
   updateSubgruposList();
@@ -783,9 +788,9 @@ function updateSubgruposList(){
   const grupoActual=document.getElementById('f-grupo').value.trim();
   let subgrupos;
   if(grupoActual){
-    subgrupos=[...new Set(data.tasks.filter(t=>t.grupo===grupoActual).map(t=>t.subgrupo).filter(Boolean))];
+    subgrupos=[...new Set(data.tasks.filter(t=>t.grupo===grupoActual).map(t=>t.subgrupo).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
   } else {
-    subgrupos=[...new Set(data.tasks.map(t=>t.subgrupo).filter(Boolean))];
+    subgrupos=[...new Set(data.tasks.map(t=>t.subgrupo).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
   }
   document.getElementById('subgrupos-list').innerHTML=subgrupos.map(s=>`<option value="${esc(s)}">`).join('');
 }
