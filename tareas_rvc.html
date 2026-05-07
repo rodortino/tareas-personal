@@ -884,7 +884,6 @@ function moveSgrp(grupo, sgrp, dir){
   const order=data.sgrupoOrder[grupo];
   todosSubgrupos.forEach(s=>{ if(!order.includes(s)) order.push(s); });
   const idx=order.indexOf(sgrp);
-  showToast(`Orden: ${order.join(' → ')} | idx:${idx}`);
   if(idx<0) return;
   const newIdx=idx+dir;
   if(newIdx<0||newIdx>=order.length) return;
