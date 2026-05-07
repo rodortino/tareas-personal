@@ -867,6 +867,25 @@ function openModalConGrupo(grupo, subgrupo){
   updateSubgruposList();
 }
 
+// ── MOVER SUBGRUPOS ──────────────────────────────────────────
+function moveSgrp(grupo, sgrp, dir){
+  const todosSubgrupos=[...new Set(data.tasks.filter(t=>t.grupo===grupo).map(t=>t.subgrupo).filter(Boolean))];
+  if(!data.sgrupoOrder) data.sgrupoOrder={};
+  if(!data.sgrupoOrder[grupo] || data.sgrupoOrder[grupo].length < todosSubgrupos.length){
+    data.sgrupoOrder[grupo]=[...todosSubgrupos];
+  }
+  const order=data.sgrupoOrder[grupo];
+  todosSubgrupos.forEach(s=>{ if(!order.includes(s)) order.push(s); });
+  const idx=order.indexOf(sgrp);
+  if(idx<0) return;
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=order.length) return;
+  order.splice(idx,1);
+  order.splice(newIdx,0,sgrp);
+  saveToDrive();
+  render();
+}
+
 function addGrupo(){ const n=prompt('Nombre del grupo:'); if(!n?.trim())return; openModal({grupo:n.trim()}); }
 function addSubgrupo(g){ const n=prompt(`Nombre del subgrupo en "${g}":`); if(!n?.trim())return; openModal({grupo:g,subgrupo:n.trim()}); }
 
