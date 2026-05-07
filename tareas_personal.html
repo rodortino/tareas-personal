@@ -171,7 +171,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .clear-filters-btn:hover{background:#EDADAA}
 
 /* FAB */
-.fab{position:fixed;bottom:24px;right:20px;width:56px;height:56px;background:var(--accent);color:#fff;border:none;border-radius:50%;font-size:28px;cursor:pointer;box-shadow:0 4px 16px rgba(26,74,122,.4);display:none;align-items:center;justify-content:center;z-index:150}
+.fab{position:fixed;bottom:28px;right:20px;width:60px;height:60px;background:var(--accent);color:#fff;border:none;border-radius:50%;font-size:30px;cursor:pointer;box-shadow:0 4px 20px rgba(26,74,122,.5);display:none;align-items:center;justify-content:center;z-index:999}
 @media(max-width:768px){.fab{display:flex}}
 .fab:active{transform:scale(.92)}
 
@@ -259,9 +259,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="hdr">
     <div class="hdr-left"><h1>Tareas Personal</h1><p id="hdr-date"></p></div>
     <div class="hdr-right">
+      <button class="hbtn desk-only" onclick="loadFromDrive()" title="Sincronizar" style="font-size:14px">🔄</button>
       <button class="hbtn primary desk-only" onclick="openModal()">+ Nueva tarea</button>
       <button class="hbtn desk-only" onclick="openPersonasModal()" style="font-size:11px">⚙ Personas</button>
       <button class="hbtn mob-only" onclick="openPersonasModal()" style="font-size:18px;padding:0 10px;background:rgba(255,255,255,.15)">👥</button>
+      <button class="hbtn mob-only" onclick="loadFromDrive()" style="font-size:16px;padding:0 10px;background:rgba(255,255,255,.15)" title="Sincronizar">🔄</button>
       <div class="hdr-avatar" id="hdr-avatar" onclick="signOut()" title="Cerrar sesión">?</div>
     </div>
   </div>
@@ -474,22 +476,44 @@ let tempSubtareas = [];
 // ══ GOOGLE AUTH ══════════════════════════════════════════════════
 function loadScript(src){ return new Promise(r=>{ const s=document.createElement('script'); s.src=src; s.onload=r; document.head.appendChild(s); }); }
 
+async function loadGoogleLibs(){
+  if(!window.google) await loadScript('https://accounts.google.com/gsi/client');
+  if(!window.gapi){ await loadScript('https://apis.google.com/js/api.js'); await new Promise(r=>gapi.load('client',r)); await gapi.client.init({}); await gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'); }
+}
+
 async function signIn() {
   document.getElementById('login-err').textContent='';
   document.getElementById('login-btn').textContent='Conectando...';
   try {
-    if(!window.google) await loadScript('https://accounts.google.com/gsi/client');
-    if(!window.gapi){ await loadScript('https://apis.google.com/js/api.js'); await new Promise(r=>gapi.load('client',r)); await gapi.client.init({}); await gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'); }
+    await loadGoogleLibs();
     google.accounts.oauth2.initTokenClient({
       client_id:GOOGLE_CLIENT_ID,
       scope:'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile',
       callback:async(resp)=>{
         if(resp.error){ document.getElementById('login-err').textContent='Error: '+resp.error; document.getElementById('login-btn').textContent='Iniciar sesión con Google'; return; }
-        accessToken=resp.access_token; gapi.client.setToken({access_token:accessToken});
+        accessToken=resp.access_token;
+        sessionStorage.setItem('gtoken', accessToken);
+        gapi.client.setToken({access_token:accessToken});
         await loadUserInfo(); await initApp();
       }
     }).requestAccessToken({prompt:''});
   } catch(e){ document.getElementById('login-err').textContent='Error: '+e.message; document.getElementById('login-btn').textContent='Iniciar sesión con Google'; }
+}
+
+async function tryAutoLogin(){
+  const saved = sessionStorage.getItem('gtoken');
+  if(!saved) return false;
+  try {
+    await loadGoogleLibs();
+    accessToken = saved;
+    gapi.client.setToken({access_token:accessToken});
+    // Verificar que el token sigue válido
+    const test = await fetch('https://www.googleapis.com/oauth2/v2/userinfo',{headers:{Authorization:`Bearer ${accessToken}`}});
+    if(!test.ok){ sessionStorage.removeItem('gtoken'); return false; }
+    await loadUserInfo();
+    await initApp();
+    return true;
+  } catch(e){ sessionStorage.removeItem('gtoken'); return false; }
 }
 
 async function loadUserInfo(){
@@ -808,6 +832,14 @@ function drop(e,targetId){ e.preventDefault(); if(!dragId||dragId===targetId)ret
 
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 window.addEventListener('resize',render);
+
+// Auto-login al cargar
+(async()=>{
+  const autoOk = await tryAutoLogin();
+  if(!autoOk){
+    document.getElementById('login-screen').style.display='flex';
+  }
+})();
 </script>
 </body>
 </html>
