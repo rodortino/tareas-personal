@@ -145,7 +145,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .grupo.drag-over{border:2px dashed var(--accent);background:var(--accent-l)}
 .drag-handle{cursor:grab;color:var(--text3);font-size:14px;padding:0 4px;flex-shrink:0}
 .drag-handle:active{cursor:grabbing}
-.subgrupo.drag-over-sub{border-top:2px solid var(--accent)}
+.sgrp-btns{display:flex;flex-direction:column;gap:1px;flex-shrink:0}
+.sgrp-move-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:9px;padding:0 3px;line-height:1.2;display:block}
+.sgrp-move-btn:hover{color:var(--accent)}
 
 .grupo{margin-bottom:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
 .grp-hdr{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--surface2);cursor:pointer;user-select:none;transition:background .12s}
@@ -737,7 +739,7 @@ function renderGroups(){
       const tasks=gm[g][s];
       if(!tasks.length)return;
       const rows=tasks.map(t=>renderRow(t,isMob)).join('');
-      if(sName) sgHtml+=`<div class="subgrupo" draggable="true" data-sgrp="${esc(sName)}" data-grupo="${esc(gName)}" ondragstart="dragSgrpStart(event,'${esc(gName)}','${esc(sName)}')" ondragover="dragSgrpOver(event)" ondrop="dragSgrpDrop(event,'${esc(gName)}','${esc(sName)}')" ondragleave="this.classList.remove('drag-over-sub')"><div class="sgrp-hdr" onclick="toggleSgrp(this)"><span class="drag-handle" onclick="event.stopPropagation()" title="Arrastrar">⠿</span><span class="sgrp-arrow">▾</span><span style="font-size:13px">📂</span><span class="sgrp-name">${esc(sName)}</span><span class="sgrp-cnt">${tasks.length}</span><span class="grp-add" onclick="event.stopPropagation();openModalConGrupo('${esc(gName)}','${esc(sName)}')" style="margin-left:auto;background:var(--accent);color:#fff;border-color:var(--accent)">+ Tarea</span></div><div class="sgrp-body"><div>${rows}</div></div></div>`;
+      if(sName) sgHtml+=`<div class="subgrupo"><div class="sgrp-hdr" onclick="toggleSgrp(this)"><span class="sgrp-btns"><button class="sgrp-move-btn" onclick="event.stopPropagation();moveSgrp('${esc(gName)}','${esc(sName)}',-1)" title="Subir">▲</button><button class="sgrp-move-btn" onclick="event.stopPropagation();moveSgrp('${esc(gName)}','${esc(sName)}',1)" title="Bajar">▼</button></span><span class="sgrp-arrow">▾</span><span style="font-size:13px">📂</span><span class="sgrp-name">${esc(sName)}</span><span class="sgrp-cnt">${tasks.length}</span><span class="grp-add" onclick="event.stopPropagation();openModalConGrupo('${esc(gName)}','${esc(sName)}')" style="margin-left:auto;background:var(--accent);color:#fff;border-color:var(--accent)">+ Tarea</span></div><div class="sgrp-body"><div>${rows}</div></div></div>`;
       else sgHtml+=`<div class="subgrupo" style="border-top:${gName?'1px solid var(--border)':'none'}"><div class="sgrp-body"><div>${rows}</div></div></div>`;
     });
     if(!sgHtml)return;
