@@ -277,7 +277,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <div class="app" id="app">
   <div class="hdr">
-    <div class="hdr-left"><h1>Tareas RVC <span style="font-size:10px;font-weight:400;opacity:.6">v1.6</span></h1><p id="hdr-date"></p></div>
+    <div class="hdr-left"><h1>Tareas RVC <span style="font-size:10px;font-weight:400;opacity:.6">v1.7</span></h1><p id="hdr-date"></p></div>
     <div class="hdr-right">
       <button class="hbtn desk-only" onclick="loadFromDrive()" title="Sincronizar" style="font-size:14px">🔄</button>
       <button class="hbtn primary desk-only" onclick="openModal()">+ Nueva tarea</button>
@@ -582,6 +582,18 @@ async function getOrCreateFolder(){
 
 async function loadFromDrive(){
   setSyncStatus('syncing','Sincronizando...');
+  // Si hay respaldo local pendiente, subirlo primero a Drive
+  const backup = loadLocal();
+  if(backup && backup.data){
+    const syncBar = document.getElementById('sync-bar');
+    if(syncBar && syncBar.classList.contains('error')){
+      setSyncStatus('syncing','Subiendo respaldo local a Drive...');
+      data = backup.data;
+      await saveToDrive();
+      showToast('✓ Respaldo local subido a Drive');
+      return;
+    }
+  }
   try{
     const fid=await getOrCreateFolder();
     const r=await gapi.client.drive.files.list({q:`name='${DRIVE_FILE_NAME}' and '${fid}' in parents and trashed=false`,fields:'files(id)'});
