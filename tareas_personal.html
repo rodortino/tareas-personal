@@ -591,8 +591,52 @@ async function loadFromDrive(){
       data=await res.json();
       if(!data.tasks)data.tasks=[]; if(!data.personas)data.personas=[]; if(!data.grupoOrder)data.grupoOrder=[]; if(!data.sgrupoOrder)data.sgrupoOrder={};
     } else { data={tasks:[],personas:[]}; }
-    setSyncStatus('ok','Sincronizado'); render();
-  }catch(e){ setSyncStatus('error','Error de sincronización'); data={tasks:[],personas:[]}; render(); }
+    setSyncStatus('ok','Sincronizado');
+    localStorage.removeItem('tp_backup');
+    render();
+  }catch(e){
+    setSyncStatus('error','⚠ Error de sincronización');
+    const backup = loadLocal();
+    if(backup && backup.data && backup.data.tasks && backup.data.tasks.length > 0){
+      data = backup.data;
+      const fecha = new Date(backup.ts).toLocaleTimeString();
+      setSyncStatus('error',`⚠ Drive no disponible — cargando respaldo local (${fecha})`);
+      showToast('Cargando desde respaldo local');
+    } else {
+      data={tasks:[],personas:[]};
+    }
+    render();
+  }
+}
+
+
+async function loadFromDrive(){
+  setSyncStatus('syncing','Sincronizando...');
+  try{
+    const fid=await getOrCreateFolder();
+    const r=await gapi.client.drive.files.list({q:`name='${DRIVE_FILE_NAME}' and '${fid}' in parents and trashed=false`,fields:'files(id)'});
+    if(r.result.files.length>0){
+      driveFileId=r.result.files[0].id;
+      const res=await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,{headers:{Authorization:`Bearer ${accessToken}`}});
+      data=await res.json();
+      if(!data.tasks)data.tasks=[]; if(!data.personas)data.personas=[]; if(!data.grupoOrder)data.grupoOrder=[]; if(!data.sgrupoOrder)data.sgrupoOrder={};
+    } else { data={tasks:[],personas:[]}; }
+    setSyncStatus('ok','Sincronizado');
+    localStorage.removeItem('tp_backup');
+    render();
+  }catch(e){
+    setSyncStatus('error','⚠ Error de sincronización');
+    const backup = loadLocal();
+    if(backup && backup.data && backup.data.tasks && backup.data.tasks.length > 0){
+      data = backup.data;
+      const fecha = new Date(backup.ts).toLocaleTimeString();
+      setSyncStatus('error',`⚠ Drive no disponible — cargando respaldo local (${fecha})`);
+      showToast('Cargando desde respaldo local');
+    } else {
+      data={tasks:[],personas:[]};
+    }
+    render();
+  }
 }
 
 async function saveToDrive(){
@@ -1031,6 +1075,13 @@ function drop(e,targetId){ e.preventDefault(); if(!dragId||dragId===targetId)ret
 
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 window.addEventListener('resize',render);
+window.addEventListener('beforeunload', function(e){
+  const bar = document.getElementById('sync-bar');
+  if(bar && bar.classList.contains('error')){
+    e.preventDefault();
+    e.returnValue = 'Hay cambios sin sincronizar con Google Drive. ¿Seguro que quieres salir?';
+  }
+});
 
 // Auto-login al cargar
 (async()=>{

@@ -591,25 +591,59 @@ async function loadFromDrive(){
       data=await res.json();
       if(!data.tasks)data.tasks=[]; if(!data.personas)data.personas=[]; if(!data.grupoOrder)data.grupoOrder=[]; if(!data.sgrupoOrder)data.sgrupoOrder={};
     } else { data={tasks:[],personas:[]}; }
-    setSyncStatus('ok','Sincronizado'); render();
-  }catch(e){ setSyncStatus('error','Error de sincronización'); data={tasks:[],personas:[]}; render(); }
+    setSyncStatus('ok','Sincronizado');
+    // Limpiar respaldo local ya que Drive tiene la versión correcta
+    localStorage.removeItem('rvc_backup');
+    render();
+  }catch(e){
+    setSyncStatus('error','⚠ Error de sincronización');
+    // Intentar cargar desde respaldo local
+    const backup = loadLocal();
+    if(backup && backup.data && backup.data.tasks && backup.data.tasks.length > 0){
+      data = backup.data;
+      const fecha = new Date(backup.ts).toLocaleTimeString();
+      setSyncStatus('error',`⚠ Drive no disponible — cargando respaldo local (${fecha})`);
+      showToast('Cargando desde respaldo local');
+    } else {
+      data={tasks:[],personas:[]};
+    }
+    render();
+  }
+}
+
+function saveLocal(){
+  try{ localStorage.setItem('rvc_backup', JSON.stringify({data, ts: Date.now()})); } catch(e){}
+}
+
+function loadLocal(){
+  try{
+    const saved = localStorage.getItem('rvc_backup');
+    if(!saved) return null;
+    const parsed = JSON.parse(saved);
+    return parsed;
+  } catch(e){ return null; }
 }
 
 async function saveToDrive(){
+  // Siempre guardar localmente primero como respaldo
+  saveLocal();
   setSyncStatus('syncing','Guardando...');
   try{
-    const fid=await getOrCreateFolder(); const content=JSON.stringify(data,null,2);
+    const fid=await getOrCreateFolder(); const json=JSON.stringify(data,null,2);
     if(driveFileId){
-      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,{method:'PATCH',headers:{Authorization:`Bearer ${accessToken}`,'Content-Type':'application/json'},body:content});
+      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,{method:'PATCH',headers:{Authorization:`Bearer ${accessToken}`,'Content-Type':'application/json'},body:json});
     } else {
       const form=new FormData();
       form.append('metadata',new Blob([JSON.stringify({name:DRIVE_FILE_NAME,parents:[fid]})],{type:'application/json'}));
-      form.append('file',new Blob([content],{type:'application/json'}));
+      form.append('file',new Blob([json],{type:'application/json'}));
       const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:`Bearer ${accessToken}`},body:form});
       driveFileId=(await r.json()).id;
     }
     setSyncStatus('ok','Guardado ✓'); setTimeout(()=>setSyncStatus('ok','Sincronizado'),2000);
-  }catch(e){ setSyncStatus('error','Error al guardar'); }
+  }catch(e){
+    setSyncStatus('error','⚠ Error al guardar en Drive — datos respaldados localmente');
+    showToast('⚠ Error Drive — respaldo local guardado');
+  }
 }
 
 function setSyncStatus(t,m){ const b=document.getElementById('sync-bar'); b.className='sync-bar '+t; document.getElementById('sync-text').textContent=m; }
@@ -1031,6 +1065,13 @@ function drop(e,targetId){ e.preventDefault(); if(!dragId||dragId===targetId)ret
 
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 window.addEventListener('resize',render);
+window.addEventListener('beforeunload', function(e){
+  const bar = document.getElementById('sync-bar');
+  if(bar && bar.classList.contains('error')){
+    e.preventDefault();
+    e.returnValue = 'Hay cambios sin sincronizar con Google Drive. ¿Seguro que quieres salir?';
+  }
+});
 
 // Auto-login al cargar
 (async()=>{
