@@ -277,7 +277,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <div class="app" id="app">
   <div class="hdr">
-    <div class="hdr-left"><h1>Tareas RVC <span style="font-size:10px;font-weight:400;opacity:.6">v1.8</span></h1><p id="hdr-date"></p></div>
+    <div class="hdr-left"><h1>Tareas RVC <span style="font-size:10px;font-weight:400;opacity:.6">v1.9</span></h1><p id="hdr-date"></p></div>
     <div class="hdr-right">
       <button class="hbtn desk-only" onclick="loadFromDrive()" title="Sincronizar" style="font-size:14px">🔄</button>
       <button class="hbtn primary desk-only" onclick="openModal()">+ Nueva tarea</button>
@@ -581,8 +581,14 @@ async function getOrCreateFolder(){
 }
 
 async function loadFromDrive(){
+  // Verificar conexión antes de hacer nada
+  if(!navigator.onLine){
+    setSyncStatus('error','⚠ Sin internet — no se puede sincronizar');
+    showToast('⚠ Sin conexión a internet');
+    return;
+  }
   setSyncStatus('syncing','Sincronizando...');
-  // Si hay respaldo local, preguntar si subir antes de recargar desde Drive
+  // Si hay respaldo local, subirlo primero a Drive
   const backup = loadLocal();
   if(backup && backup.data && backup.data.tasks && backup.data.tasks.length > 0){
     setSyncStatus('syncing','Subiendo respaldo local a Drive...');
@@ -652,8 +658,9 @@ async function saveToDrive(){
     }
     setSyncStatus('ok','Guardado ✓'); setTimeout(()=>setSyncStatus('ok','Sincronizado'),2000);
   }catch(e){
-    setSyncStatus('error','⚠ Error al guardar en Drive — datos respaldados localmente');
+    setSyncStatus('error','⚠ Error al guardar — datos respaldados localmente');
     showToast('⚠ Error Drive — respaldo local guardado');
+    // No borrar respaldo local si falla Drive
   }
 }
 
