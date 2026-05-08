@@ -277,7 +277,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <div class="app" id="app">
   <div class="hdr">
-    <div class="hdr-left"><h1>Tareas Personal <span style="font-size:10px;font-weight:400;opacity:.6">v1.7</span></h1><p id="hdr-date"></p></div>
+    <div class="hdr-left"><h1>Tareas Personal <span style="font-size:10px;font-weight:400;opacity:.6">v1.9</span></h1><p id="hdr-date"></p></div>
     <div class="hdr-right">
       <button class="hbtn desk-only" onclick="loadFromDrive()" title="Sincronizar" style="font-size:14px">🔄</button>
       <button class="hbtn primary desk-only" onclick="openModal()">+ Nueva tarea</button>
@@ -581,17 +581,21 @@ async function getOrCreateFolder(){
 }
 
 async function loadFromDrive(){
+  if(!navigator.onLine){
+    setSyncStatus('error','⚠ Sin internet — no se puede sincronizar');
+    showToast('⚠ Sin conexión a internet');
+    return;
+  }
   setSyncStatus('syncing','Sincronizando...');
   const backup = loadLocal();
-  if(backup && backup.data){
-    const syncBar = document.getElementById('sync-bar');
-    if(syncBar && syncBar.classList.contains('error')){
-      setSyncStatus('syncing','Subiendo respaldo local a Drive...');
-      data = backup.data;
-      await saveToDrive();
-      showToast('✓ Respaldo local subido a Drive');
-      return;
-    }
+  if(backup && backup.data && backup.data.tasks && backup.data.tasks.length > 0){
+    setSyncStatus('syncing','Subiendo respaldo local a Drive...');
+    data = backup.data;
+    await saveToDrive();
+    showToast('✓ Respaldo local subido a Drive');
+    localStorage.removeItem('tp_backup');
+    render();
+    return;
   }
   try{
     const fid=await getOrCreateFolder();
@@ -622,17 +626,21 @@ async function loadFromDrive(){
 
 
 async function loadFromDrive(){
+  if(!navigator.onLine){
+    setSyncStatus('error','⚠ Sin internet — no se puede sincronizar');
+    showToast('⚠ Sin conexión a internet');
+    return;
+  }
   setSyncStatus('syncing','Sincronizando...');
   const backup = loadLocal();
-  if(backup && backup.data){
-    const syncBar = document.getElementById('sync-bar');
-    if(syncBar && syncBar.classList.contains('error')){
-      setSyncStatus('syncing','Subiendo respaldo local a Drive...');
-      data = backup.data;
-      await saveToDrive();
-      showToast('✓ Respaldo local subido a Drive');
-      return;
-    }
+  if(backup && backup.data && backup.data.tasks && backup.data.tasks.length > 0){
+    setSyncStatus('syncing','Subiendo respaldo local a Drive...');
+    data = backup.data;
+    await saveToDrive();
+    showToast('✓ Respaldo local subido a Drive');
+    localStorage.removeItem('tp_backup');
+    render();
+    return;
   }
   try{
     const fid=await getOrCreateFolder();
