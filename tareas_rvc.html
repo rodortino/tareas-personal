@@ -65,7 +65,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .search-bar{padding:10px 20px 6px;flex-shrink:0;background:var(--bg)}
   .groups-wrap{padding:0 20px 60px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
   /* Global col header for desktop */
-  .global-col-hdr{display:grid;grid-template-columns:28px 1fr 100px 110px 78px 92px 92px;gap:0;padding:6px 12px 6px 26px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border)}
+  .global-col-hdr{display:grid;grid-template-columns:28px 1fr 100px 110px 78px 92px 92px;gap:0;padding:6px 12px 6px 46px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border);margin:0 -20px}
   .trow{display:grid;grid-template-columns:28px 1fr 100px 110px 78px 92px 92px;gap:0;padding:8px 12px 8px 26px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
   .trow:hover{background:#FAFAF8}
 }
@@ -792,7 +792,7 @@ function renderGroups(){
   // Header global de columnas — sticky arriba dentro del scroll
   const colHdrHtml = list.length===0 ? '' : isMob
     ? `<div class="global-col-hdr" style="position:sticky;top:0;z-index:5"><span></span><span></span><span>Título / Detalle</span><div style="display:flex;justify-content:flex-end"><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text2);text-transform:uppercase">Inicio</span><span style="min-width:8px"></span><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text2);text-transform:uppercase">Límite</span></div></div>`
-    : `<div class="global-col-hdr" style="position:sticky;top:0;z-index:5"><span></span><span></span><span>Título</span><span>Responsable</span><span>Estado</span><span>Prioridad</span><span>F. inicio</span><span>F. límite</span></div>`;
+    : `<div class="global-col-hdr" style="position:sticky;top:0;z-index:5;margin:0 -20px;padding:6px 12px 6px 46px"><span></span><span>Título</span><span>Responsable</span><span>Estado</span><span>Prioridad</span><span>F. inicio</span><span>F. límite</span></div>`;
 
   if(Object.keys(gm).length===0){
     wrap.innerHTML=`${colHdrHtml}<div style="text-align:center;padding:48px 20px;color:var(--text3);font-size:14px">Sin tareas que coincidan con los filtros</div><div class="add-grupo" onclick="addGrupo()"><span style="font-size:18px">+</span> Nuevo grupo</div>`;
