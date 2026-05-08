@@ -277,7 +277,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <div class="app" id="app">
   <div class="hdr">
-    <div class="hdr-left"><h1>Tareas RVC <span style="font-size:10px;font-weight:400;opacity:.6">v1.9</span></h1><p id="hdr-date"></p></div>
+    <div class="hdr-left"><h1>Tareas RVC <span style="font-size:10px;font-weight:400;opacity:.6">v2.0</span></h1><p id="hdr-date"></p></div>
     <div class="hdr-right">
       <button class="hbtn desk-only" onclick="loadFromDrive()" title="Sincronizar" style="font-size:14px">🔄</button>
       <button class="hbtn primary desk-only" onclick="openModal()">+ Nueva tarea</button>
@@ -334,11 +334,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         </div>
       </div>
       <div class="fblock">
-        <div class="fblock-title fblock-toggle" onclick="toggleFblock(this)">Fecha límite <span class="fblock-arrow">▾</span></div>
+        <div class="fblock-title fblock-toggle" onclick="toggleFblock(this)">Fecha límite tarea <span class="fblock-arrow">▾</span></div>
         <div class="fblock-body">
           <div class="fdate-row"><div class="fdate-lbl">Desde</div><input class="fdate-input" type="date" id="sb-desde" onchange="render()"></div>
           <div class="fdate-row"><div class="fdate-lbl">Hasta</div><input class="fdate-input" type="date" id="sb-hasta" onchange="render()"></div>
           <span class="fclear" onclick="document.getElementById('sb-desde').value='';document.getElementById('sb-hasta').value='';render()">✕ Limpiar rango</span>
+        </div>
+      </div>
+      <div class="fblock">
+        <div class="fblock-title fblock-toggle" onclick="toggleFblock(this)">Fecha límite subtarea <span class="fblock-arrow">▾</span></div>
+        <div class="fblock-body">
+          <div class="fdate-row"><div class="fdate-lbl">Desde</div><input class="fdate-input" type="date" id="sb-sub-desde" onchange="render()"></div>
+          <div class="fdate-row"><div class="fdate-lbl">Hasta</div><input class="fdate-input" type="date" id="sb-sub-hasta" onchange="render()"></div>
+          <span class="fclear" onclick="document.getElementById('sb-sub-desde').value='';document.getElementById('sb-sub-hasta').value='';render()">✕ Limpiar rango</span>
         </div>
       </div>
       <button class="clear-filters-btn" onclick="clearAllFilters()">✕ Limpiar todos los filtros</button>
@@ -383,12 +391,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
             <div class="chip" onclick="mobFilter('inicio','iniciada',this)">▶ Ya iniciadas</div>
             <div class="chip" onclick="mobFilter('inicio','no_iniciada',this)">⏳ No iniciadas</div>
           </div></div>
-          <div class="fp-section"><div class="fp-title">Fecha límite</div>
+          <div class="fp-section"><div class="fp-title">F. límite tarea</div>
             <div class="fp-dates">
               <div><div class="fp-date-lbl">Desde</div><input class="fp-date-input" type="date" id="mob-desde" onchange="render()"></div>
               <div><div class="fp-date-lbl">Hasta</div><input class="fp-date-input" type="date" id="mob-hasta" onchange="render()"></div>
             </div>
-            <div class="fp-clear" onclick="document.getElementById('mob-desde').value='';document.getElementById('mob-hasta').value='';render()">✕ Limpiar rango fechas</div>
+            <div class="fp-clear" onclick="document.getElementById('mob-desde').value='';document.getElementById('mob-hasta').value='';render()">✕ Limpiar</div>
+          </div>
+          <div class="fp-section"><div class="fp-title">F. límite subtarea</div>
+            <div class="fp-dates">
+              <div><div class="fp-date-lbl">Desde</div><input class="fp-date-input" type="date" id="mob-sub-desde" onchange="render()"></div>
+              <div><div class="fp-date-lbl">Hasta</div><input class="fp-date-input" type="date" id="mob-sub-hasta" onchange="render()"></div>
+            </div>
+            <div class="fp-clear" onclick="document.getElementById('mob-sub-desde').value='';document.getElementById('mob-sub-hasta').value='';render()">✕ Limpiar</div>
           </div>
           <div class="fp-section">
             <button style="width:100%;padding:10px;border-radius:8px;background:var(--red-l);color:var(--red);border:none;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer" onclick="clearAllFilters()">✕ Limpiar todos los filtros</button>
@@ -688,7 +703,7 @@ function mobFilter(key,val,el){ filters[key]=val; el.closest('.fp-chips').queryS
 
 function clearAllFilters(){
   filters={responsable:'',estado:'',prioridad:'',inicio:''};
-  ['sb-desde','sb-hasta','mob-desde','mob-hasta'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
+  ['sb-desde','sb-hasta','mob-desde','mob-hasta','sb-sub-desde','sb-sub-hasta','mob-sub-desde','mob-sub-hasta'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
   // Reset all sidebar active states
   document.querySelectorAll('.fopt').forEach(o=>o.classList.remove('active'));
   document.querySelectorAll('.fblock').forEach(b=>{ const first=b.querySelector('.fopt'); if(first)first.classList.add('active'); });
@@ -721,6 +736,19 @@ function getFiltered(){
       if(!t.limite)return false;
       if(desde&&t.limite<desde)return false;
       if(hasta&&t.limite>hasta)return false;
+    }
+    // Filtro fecha subtarea
+    const subDesde=isMob?document.getElementById('mob-sub-desde')?.value:document.getElementById('sb-sub-desde')?.value;
+    const subHasta=isMob?document.getElementById('mob-sub-hasta')?.value:document.getElementById('sb-sub-hasta')?.value;
+    if(subDesde||subHasta){
+      const subs=t.subtareas||[];
+      const tieneSubEnRango=subs.some(s=>{
+        if(!s.fecha)return false;
+        if(subDesde&&s.fecha<subDesde)return false;
+        if(subHasta&&s.fecha>subHasta)return false;
+        return true;
+      });
+      if(!tieneSubEnRango)return false;
     }
     return true;
   });
@@ -977,7 +1005,13 @@ function renderActiveChips(){
   const hasta=document.getElementById('mob-hasta')?.value;
   if(desde||hasta){
     const label=(desde&&hasta)?`${fmt(desde)}-${fmt(hasta)}`:desde?`Desde ${fmt(desde)}`:`Hasta ${fmt(hasta)}`;
-    chips.push(`<div class="active-chip">${label} <span class="active-chip-x" onclick="clearDateFilter()">✕</span></div>`);
+    chips.push(`<div class="active-chip">Tarea: ${label} <span class="active-chip-x" onclick="clearDateFilter()">✕</span></div>`);
+  }
+  const subDesde=document.getElementById('mob-sub-desde')?.value;
+  const subHasta=document.getElementById('mob-sub-hasta')?.value;
+  if(subDesde||subHasta){
+    const label2=(subDesde&&subHasta)?`${fmt(subDesde)}-${fmt(subHasta)}`:subDesde?`Desde ${fmt(subDesde)}`:`Hasta ${fmt(subHasta)}`;
+    chips.push(`<div class="active-chip">Subtarea: ${label2} <span class="active-chip-x" onclick="clearSubDateFilter()">✕</span></div>`);
   }
   if(chips.length>0){ bar.style.display='flex'; bar.innerHTML=chips.join(''); }
   else{ bar.style.display='none'; bar.innerHTML=''; }
@@ -994,6 +1028,11 @@ function clearOneFilter(key){
     const firstChip=fc.querySelector('.chip');
     if(firstChip){ fc.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); firstChip.classList.add('active'); }
   });
+  render();
+}
+
+function clearSubDateFilter(){
+  ['mob-sub-desde','mob-sub-hasta','sb-sub-desde','sb-sub-hasta'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
   render();
 }
 
