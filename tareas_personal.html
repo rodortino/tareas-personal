@@ -278,11 +278,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <div class="app" id="app">
   <div class="hdr">
-    <div class="hdr-left"><h1>Tareas Personal <span style="font-size:10px;font-weight:400;opacity:.6">v2.6</span></h1><p id="hdr-date"></p></div>
+    <div class="hdr-left"><h1>Tareas Personal <span style="font-size:10px;font-weight:400;opacity:.6">v2.7</span></h1><p id="hdr-date"></p></div>
     <div class="hdr-right">
       <button class="hbtn desk-only" onclick="loadFromDrive()" title="Sincronizar" style="font-size:14px">🔄</button>
+      <button class="hbtn desk-only" onclick="exportarJSON()" title="Descargar respaldo">↓ Respaldo</button>
       <button class="hbtn primary desk-only" onclick="openModal()">+ Nueva tarea</button>
       <button class="hbtn desk-only" onclick="openPersonasModal()" style="font-size:11px">⚙ Personas</button>
+      <button class="hbtn mob-only" onclick="exportarJSON()" style="font-size:16px;padding:0 10px;background:rgba(255,255,255,.15)" title="Respaldo">↓</button>
       <button class="hbtn mob-only" onclick="openPersonasModal()" style="font-size:18px;padding:0 10px;background:rgba(255,255,255,.15)">👥</button>
       <button class="hbtn mob-only" onclick="loadFromDrive()" style="font-size:16px;padding:0 10px;background:rgba(255,255,255,.15)" title="Sincronizar">🔄</button>
       <div class="hdr-avatar" id="hdr-avatar" onclick="signOut()" title="Cerrar sesión">?</div>
@@ -679,6 +681,8 @@ async function saveToDrive(){
       sessionStorage.setItem('fileid_personal', driveFileId);
     }
     setSyncStatus('ok','Guardado ✓'); setTimeout(()=>setSyncStatus('ok','Sincronizado'),2000);
+    // Respaldo diario automático
+    checkDailyBackup();
   }catch(e){
     setSyncStatus('error','⚠ Error al guardar — datos respaldados localmente');
     showToast('⚠ Error Drive — respaldo local guardado');
@@ -838,7 +842,7 @@ function renderGroups(){
       else sgHtml+=`<div class="subgrupo" style="border-top:${gName?'1px solid var(--border)':'none'}"><div class="sgrp-body"><div>${rows}</div></div></div>`;
     });
     if(!sgHtml)return;
-    if(gName) html+=`<div class="grupo" draggable="true" data-grupo="${esc(gName)}" ondragstart="dragGrupoStart(event,'${esc(gName)}')" ondragover="dragGrupoOver(event)" ondrop="dragGrupoDrop(event,'${esc(gName)}')"><div class="grp-hdr" onclick="toggleGrp(this)"><span class="drag-handle" onclick="event.stopPropagation()" title="Arrastrar para reordenar">⠿</span><span class="grp-arrow">▾</span><span style="font-size:15px">📁</span><span class="grp-name">${esc(gName)}</span><span class="grp-cnt">${total}</span><span class="grp-add desk-only" onclick="event.stopPropagation();addSubgrupo('${esc(gName)}')">+ Subgrupo</span></div><div class="grp-body">${sgHtml}</div></div>`;
+    if(gName) html+=`<div class="grupo"><div class="grp-hdr" onclick="toggleGrp(this)"><span class="sgrp-btns" style="flex-direction:row;gap:2px"><button class="sgrp-move-btn" onclick="event.stopPropagation();moveGrupo('${esc(gName)}',-1)" title="Subir">▲</button><button class="sgrp-move-btn" onclick="event.stopPropagation();moveGrupo('${esc(gName)}',1)" title="Bajar">▼</button></span><span class="grp-arrow">▾</span><span style="font-size:15px">📁</span><span class="grp-name">${esc(gName)}</span><span class="grp-cnt">${total}</span><span class="grp-add desk-only" onclick="event.stopPropagation();addSubgrupo('${esc(gName)}')">+ Subgrupo</span></div><div class="grp-body">${sgHtml}</div></div>`;
     else html+=`<div class="grupo" style="border-style:dashed"><div class="grp-hdr" onclick="toggleGrp(this)" style="background:transparent"><span class="grp-arrow">▾</span><span style="font-size:15px">📄</span><span class="grp-name" style="color:var(--text3);font-style:italic">Sin grupo</span><span class="grp-cnt">${total}</span></div><div class="grp-body">${sgHtml}</div></div>`;
   });
   html+=`<div class="add-grupo" onclick="addGrupo()"><span style="font-size:18px">+</span> Nuevo grupo</div>`;
@@ -850,8 +854,8 @@ function renderRow(t,isMob){
   const p=(t.prioridad||'media').toLowerCase(); const done=t.estado==='Completada'; const dsi=ds(t.inicio); const dsl=ds(t.limite); const sel=selected.has(t.id);
   const subs=t.subtareas||[]; const totalSubs=subs.length; const doneSubs=subs.filter(s=>s.done).length;
   const subInfo=totalSubs>0?`<div class="sub-indicator ${doneSubs<totalSubs?'has-pending':''}">☑ ${doneSubs}/${totalSubs} subtareas</div>`:'';
-  if(isMob) return`<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)"><div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div><div style="min-width:0;padding-right:4px"><div class="ttitle">${esc(t.titulo)}</div><div class="mob-badges"><span class="badge b-${p}">${t.prioridad}</span><span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span>${t.responsable?`<span class="badge" style="background:var(--surface2);color:var(--text2)">${esc(t.responsable)}</span>`:''}</div>${subInfo}</div><div class="mob-dates"><div class="mob-date-cell"><span class="mob-date-lbl">inicio</span><span class="mob-date-val ${dsi}">${t.inicio?fmt(t.inicio):'—'}</span></div><span class="mob-date-sep">·</span><div class="mob-date-cell"><span class="mob-date-lbl">límite</span><span class="mob-date-val ${dsl}">${t.limite?(dsl==='v'?'⚠':dsl==='h'?'🔔':'')+fmt(t.limite):'—'}</span></div></div></div>`;
-  return`<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)" draggable="true" ondragstart="dragStart(event,'${t.id}')" ondragover="dragOver(event)" ondrop="drop(event,'${t.id}')"><div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div><div style="min-width:0;padding-right:8px;overflow:hidden"><div class="ttitle">${esc(t.titulo)}</div>${subInfo}</div><div class="tcell">${t.responsable?esc(t.responsable):'—'}</div><div class="tcell"><span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span></div><div class="tcell"><span class="badge b-${p}">${t.prioridad}</span></div><div class="tcell date ${dsi}">${t.inicio?fmtFull(t.inicio):'—'}</div><div class="tcell date ${dsl}">${t.limite?(dsl==='v'?'⚠ ':dsl==='h'?'🔔 ':'')+fmtFull(t.limite):'—'}</div></div>`;
+  if(isMob) return`<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)"><div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div><div style="display:flex;flex-direction:column;gap:1px;flex-shrink:0"><button class="sgrp-move-btn" onclick="event.stopPropagation();moveTarea('${t.id}',-1)">▲</button><button class="sgrp-move-btn" onclick="event.stopPropagation();moveTarea('${t.id}',1)">▼</button></div><div style="min-width:0;padding-right:4px"><div class="ttitle">${esc(t.titulo)}</div><div class="mob-badges"><span class="badge b-${p}">${t.prioridad}</span><span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span>${t.responsable?`<span class="badge" style="background:var(--surface2);color:var(--text2)">${esc(t.responsable)}</span>`:''}</div>${subInfo}</div><div class="mob-dates"><div class="mob-date-cell"><span class="mob-date-lbl">inicio</span><span class="mob-date-val ${dsi}">${t.inicio?fmt(t.inicio):'—'}</span></div><span class="mob-date-sep">·</span><div class="mob-date-cell"><span class="mob-date-lbl">límite</span><span class="mob-date-val ${dsl}">${t.limite?(dsl==='v'?'⚠':dsl==='h'?'🔔':'')+fmt(t.limite):'—'}</span></div></div></div>`;
+  return`<div class="trow ${p} ${done?'done':''} ${sel?'selected':''}" data-id="${t.id}" onclick="toggleRow(this)" ><div class="sel-chk ${sel?'on':''}" onclick="event.stopPropagation();toggleSel('${t.id}')"></div><div style="display:flex;flex-direction:column;gap:1px;flex-shrink:0"><button class="sgrp-move-btn" onclick="event.stopPropagation();moveTarea('${t.id}',-1)" title="Subir">▲</button><button class="sgrp-move-btn" onclick="event.stopPropagation();moveTarea('${t.id}',1)" title="Bajar">▼</button></div><div style="min-width:0;padding-right:8px;overflow:hidden"><div class="ttitle">${esc(t.titulo)}</div>${subInfo}</div><div class="tcell">${t.responsable?esc(t.responsable):'—'}</div><div class="tcell"><span class="badge b-${t.estado==='Pendiente'?'pend':t.estado==='En progreso'?'prog':'comp'}">${t.estado}</span></div><div class="tcell"><span class="badge b-${p}">${t.prioridad}</span></div><div class="tcell date ${dsi}">${t.inicio?fmtFull(t.inicio):'—'}</div><div class="tcell date ${dsl}">${t.limite?(dsl==='v'?'⚠ ':dsl==='h'?'🔔 ':'')+fmtFull(t.limite):'—'}</div></div>`;
 }
 
 function toggleGrp(h){ const b=h.nextElementSibling; const a=h.querySelector('.grp-arrow'); const o=b.style.display!=='none'; b.style.display=o?'none':'block'; a.classList.toggle('closed',!o); saveCollapsed(); }
@@ -963,6 +967,83 @@ function openModalConGrupo(grupo, subgrupo){
 }
 
 // ── MOVER SUBGRUPOS ──────────────────────────────────────────
+
+// ── RESPALDO DIARIO ───────────────────────────────────────────
+async function checkDailyBackup(){
+  try{
+    const lastBackup = localStorage.getItem('tp_last_backup_date');
+    const today = new Date().toISOString().split('T')[0];
+    if(lastBackup === today) return; // ya se hizo hoy
+    await createDailyBackup();
+    localStorage.setItem('tp_last_backup_date', today);
+  }catch(e){ console.log('Backup diario falló:', e); }
+}
+
+async function createDailyBackup(){
+  const today = new Date().toISOString().split('T')[0];
+  const backupName = `tareasPersonal_backup_${today}.json`;
+  const fid = await getOrCreateFolder();
+  const content = JSON.stringify({...data, backup_date: today}, null, 2);
+  const form = new FormData();
+  form.append('metadata', new Blob([JSON.stringify({name:backupName, parents:[fid]})], {type:'application/json'}));
+  form.append('file', new Blob([content], {type:'application/json'}));
+  await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+    method:'POST', headers:{Authorization:`Bearer ${accessToken}`}, body:form
+  });
+  console.log('Respaldo diario creado:', backupName);
+}
+
+// ── EXPORTAR MANUAL ───────────────────────────────────────────
+function exportarJSON(){
+  const today = new Date().toISOString().split('T')[0];
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `tareasPersonal_${today}.json`;
+  a.click();
+  showToast('✓ Respaldo descargado');
+}
+
+// ── MOVER TAREAS ─────────────────────────────────────────────
+function moveTarea(id, dir){
+  const idx = data.tasks.findIndex(t=>t.id===id);
+  if(idx<0) return;
+  const t = data.tasks[idx];
+  // Buscar tareas del mismo grupo/subgrupo
+  const sameGroup = data.tasks.filter(x=>
+    (x.grupo||null)===(t.grupo||null) &&
+    (x.subgrupo||null)===(t.subgrupo||null)
+  );
+  const posInGroup = sameGroup.findIndex(x=>x.id===id);
+  const newPos = posInGroup + dir;
+  if(newPos<0||newPos>=sameGroup.length) return;
+  // Intercambiar en data.tasks
+  const targetId = sameGroup[newPos].id;
+  const targetIdx = data.tasks.findIndex(x=>x.id===targetId);
+  data.tasks.splice(idx,1);
+  const newTargetIdx = data.tasks.findIndex(x=>x.id===targetId);
+  data.tasks.splice(newTargetIdx + (dir>0?1:0), 0, t);
+  saveToDrive();
+  render();
+}
+
+// ── MOVER GRUPOS ─────────────────────────────────────────────
+function moveGrupo(nombre, dir){
+  const grupos=[...new Set(data.tasks.map(t=>t.grupo).filter(Boolean))];
+  if(!data.grupoOrder||data.grupoOrder.length<grupos.length){
+    data.grupoOrder=[...grupos];
+  }
+  grupos.forEach(g=>{ if(!data.grupoOrder.includes(g)) data.grupoOrder.push(g); });
+  const idx=data.grupoOrder.indexOf(nombre);
+  if(idx<0) return;
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=data.grupoOrder.length) return;
+  data.grupoOrder.splice(idx,1);
+  data.grupoOrder.splice(newIdx,0,nombre);
+  saveToDrive();
+  render();
+}
+
 function moveSgrp(grupo, sgrp, dir){
   const todosSubgrupos=[...new Set(data.tasks.filter(t=>t.grupo===grupo).map(t=>t.subgrupo).filter(Boolean))];
   if(!data.sgrupoOrder) data.sgrupoOrder={};
