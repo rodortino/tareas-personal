@@ -67,7 +67,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .groups-wrap{padding:0 20px 60px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
   /* Global col header for desktop */
   .global-col-hdr{display:grid;grid-template-columns:28px 1fr 100px 110px 78px 92px 92px;gap:0;padding:6px 12px 6px 46px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border);margin:0 -20px}
-  .trow{display:grid;grid-template-columns:28px 1fr 100px 110px 78px 92px 92px;gap:0;padding:8px 12px 8px 26px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
+  .trow{display:grid;grid-template-columns:28px 1fr 100px 110px 78px 92px 92px;gap:0;padding:5px 12px 5px 26px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
   .trow:hover{background:#FAFAF8}
 }
 @media(max-width:768px){
@@ -278,7 +278,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <div class="app" id="app">
   <div class="hdr">
-    <div class="hdr-left"><h1>Tareas Personal <span style="font-size:10px;font-weight:400;opacity:.6">v2.5</span></h1><p id="hdr-date"></p></div>
+    <div class="hdr-left"><h1>Tareas Personal <span style="font-size:10px;font-weight:400;opacity:.6">v2.6</span></h1><p id="hdr-date"></p></div>
     <div class="hdr-right">
       <button class="hbtn desk-only" onclick="loadFromDrive()" title="Sincronizar" style="font-size:14px">🔄</button>
       <button class="hbtn primary desk-only" onclick="openModal()">+ Nueva tarea</button>
@@ -750,6 +750,7 @@ function getFiltered(){
     if(subDesde||subHasta){
       const subs=t.subtareas||[];
       const tieneSubEnRango=subs.some(s=>{
+        if(s.done)return false; // ignorar subtareas completadas
         if(!s.fecha)return false;
         if(subDesde&&s.fecha<subDesde)return false;
         if(subHasta&&s.fecha>subHasta)return false;
@@ -1131,6 +1132,18 @@ function drop(e,targetId){ e.preventDefault(); if(!dragId||dragId===targetId)ret
 
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 window.addEventListener('resize',render);
+
+// Sincronizar al volver a la pestaña o ventana
+document.addEventListener('visibilitychange', async function(){
+  if(document.visibilityState === 'visible' && accessToken){
+    await loadFromDrive();
+  }
+});
+window.addEventListener('focus', async function(){
+  if(accessToken){
+    await loadFromDrive();
+  }
+});
 window.addEventListener('beforeunload', function(e){
   const bar = document.getElementById('sync-bar');
   if(bar && bar.classList.contains('error')){
