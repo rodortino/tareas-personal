@@ -278,7 +278,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <div class="app" id="app">
   <div class="hdr">
-    <div class="hdr-left"><h1>Tareas Personal <span style="font-size:10px;font-weight:400;opacity:.6">v2.9</span></h1><p id="hdr-date"></p></div>
+    <div class="hdr-left"><h1>Tareas Personal <span style="font-size:10px;font-weight:400;opacity:.6">v3.1</span></h1><p id="hdr-date"></p></div>
     <div class="hdr-right">
       <button class="hbtn desk-only" onclick="loadFromDrive()" title="Sincronizar" style="font-size:14px">🔄</button>
       <button class="hbtn desk-only" onclick="exportarJSON()" title="Descargar respaldo">↓ Respaldo</button>
@@ -1006,19 +1006,19 @@ function exportarJSON(){
 
 // ── MOVER TAREAS ─────────────────────────────────────────────
 function moveTarea(id, dir){
-  const idx = data.tasks.findIndex(t=>t.id===id);
-  if(idx<0) return;
-  const t = data.tasks[idx];
-  // Buscar tareas del mismo grupo/subgrupo
-  const sameGroup = data.tasks.filter(x=>
+  const t = data.tasks.find(x=>x.id===id);
+  if(!t) return;
+  // Usar la lista filtrada visible para determinar vecinos
+  const listaVisible = getFiltered().filter(x=>
     (x.grupo||null)===(t.grupo||null) &&
     (x.subgrupo||null)===(t.subgrupo||null)
   );
-  const posInGroup = sameGroup.findIndex(x=>x.id===id);
-  const newPos = posInGroup + dir;
-  if(newPos<0||newPos>=sameGroup.length) return;
-  // Intercambiar en data.tasks
-  const targetId = sameGroup[newPos].id;
+  const posVisible = listaVisible.findIndex(x=>x.id===id);
+  const newPos = posVisible + dir;
+  if(newPos<0||newPos>=listaVisible.length) return;
+  const targetId = listaVisible[newPos].id;
+  // Mover en data.tasks
+  const idx = data.tasks.findIndex(x=>x.id===id);
   const targetIdx = data.tasks.findIndex(x=>x.id===targetId);
   data.tasks.splice(idx,1);
   const newTargetIdx = data.tasks.findIndex(x=>x.id===targetId);
@@ -1029,35 +1029,55 @@ function moveTarea(id, dir){
 
 // ── MOVER GRUPOS ─────────────────────────────────────────────
 function moveGrupo(nombre, dir){
-  const grupos=[...new Set(data.tasks.map(t=>t.grupo).filter(Boolean))];
-  if(!data.grupoOrder||data.grupoOrder.length<grupos.length){
-    data.grupoOrder=[...grupos];
-  }
-  grupos.forEach(g=>{ if(!data.grupoOrder.includes(g)) data.grupoOrder.push(g); });
-  const idx=data.grupoOrder.indexOf(nombre);
-  if(idx<0) return;
-  const newIdx=idx+dir;
-  if(newIdx<0||newIdx>=data.grupoOrder.length) return;
+  // Usar solo grupos visibles (con tareas filtradas)
+  const listaFiltrada = getFiltered();
+  const gruposVisibles = [...new Set(listaFiltrada.map(t=>t.grupo).filter(Boolean))];
+  // Inicializar grupoOrder si es necesario
+  const todosGrupos = [...new Set(data.tasks.map(t=>t.grupo).filter(Boolean))];
+  if(!data.grupoOrder||data.grupoOrder.length<todosGrupos.length) data.grupoOrder=[...todosGrupos];
+  todosGrupos.forEach(g=>{ if(!data.grupoOrder.includes(g)) data.grupoOrder.push(g); });
+  // Ordenar grupos visibles según grupoOrder actual
+  const visiblesOrdenados = gruposVisibles.sort((a,b)=>{
+    const ai=data.grupoOrder.indexOf(a); const bi=data.grupoOrder.indexOf(b);
+    if(ai>=0&&bi>=0) return ai-bi; return a.localeCompare(b);
+  });
+  const posVisible = visiblesOrdenados.indexOf(nombre);
+  const newPos = posVisible + dir;
+  if(newPos<0||newPos>=visiblesOrdenados.length) return;
+  const targetNombre = visiblesOrdenados[newPos];
+  // Mover en grupoOrder
+  const idx = data.grupoOrder.indexOf(nombre);
+  const targetIdx = data.grupoOrder.indexOf(targetNombre);
   data.grupoOrder.splice(idx,1);
-  data.grupoOrder.splice(newIdx,0,nombre);
+  const newTargetIdx = data.grupoOrder.indexOf(targetNombre);
+  data.grupoOrder.splice(newTargetIdx + (dir>0?1:0), 0, nombre);
   saveToDrive();
   render();
 }
 
 function moveSgrp(grupo, sgrp, dir){
-  const todosSubgrupos=[...new Set(data.tasks.filter(t=>t.grupo===grupo).map(t=>t.subgrupo).filter(Boolean))];
+  // Usar solo subgrupos visibles
+  const listaFiltrada = getFiltered();
+  const sgrpsVisibles = [...new Set(listaFiltrada.filter(t=>t.grupo===grupo).map(t=>t.subgrupo).filter(Boolean))];
+  const todosSubgrupos = [...new Set(data.tasks.filter(t=>t.grupo===grupo).map(t=>t.subgrupo).filter(Boolean))];
   if(!data.sgrupoOrder) data.sgrupoOrder={};
-  if(!data.sgrupoOrder[grupo] || data.sgrupoOrder[grupo].length < todosSubgrupos.length){
-    data.sgrupoOrder[grupo]=[...todosSubgrupos];
-  }
-  const order=data.sgrupoOrder[grupo];
-  todosSubgrupos.forEach(s=>{ if(!order.includes(s)) order.push(s); });
-  const idx=order.indexOf(sgrp);
-  if(idx<0) return;
-  const newIdx=idx+dir;
-  if(newIdx<0||newIdx>=order.length) return;
+  if(!data.sgrupoOrder[grupo]||data.sgrupoOrder[grupo].length<todosSubgrupos.length) data.sgrupoOrder[grupo]=[...todosSubgrupos];
+  todosSubgrupos.forEach(s=>{ if(!data.sgrupoOrder[grupo].includes(s)) data.sgrupoOrder[grupo].push(s); });
+  const order = data.sgrupoOrder[grupo];
+  // Ordenar visibles según order actual
+  const visiblesOrdenados = sgrpsVisibles.sort((a,b)=>{
+    const ai=order.indexOf(a); const bi=order.indexOf(b);
+    if(ai>=0&&bi>=0) return ai-bi; return a.localeCompare(b);
+  });
+  const posVisible = visiblesOrdenados.indexOf(sgrp);
+  const newPos = posVisible + dir;
+  if(newPos<0||newPos>=visiblesOrdenados.length) return;
+  const targetSgrp = visiblesOrdenados[newPos];
+  const idx = order.indexOf(sgrp);
+  const targetIdx = order.indexOf(targetSgrp);
   order.splice(idx,1);
-  order.splice(newIdx,0,sgrp);
+  const newTargetIdx = order.indexOf(targetSgrp);
+  order.splice(newTargetIdx + (dir>0?1:0), 0, sgrp);
   saveToDrive();
   render();
 }
