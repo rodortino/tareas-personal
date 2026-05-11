@@ -277,7 +277,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <div class="app" id="app">
   <div class="hdr">
-    <div class="hdr-left"><h1>Tareas Personal <span style="font-size:10px;font-weight:400;opacity:.6">v2.1</span></h1><p id="hdr-date"></p></div>
+    <div class="hdr-left"><h1>Tareas Personal <span style="font-size:10px;font-weight:400;opacity:.6">v2.2</span></h1><p id="hdr-date"></p></div>
     <div class="hdr-right">
       <button class="hbtn desk-only" onclick="loadFromDrive()" title="Sincronizar" style="font-size:14px">🔄</button>
       <button class="hbtn primary desk-only" onclick="openModal()">+ Nueva tarea</button>
@@ -588,6 +588,7 @@ function showError(msg){ document.getElementById('login-screen').style.display='
 
 // ══ DRIVE ════════════════════════════════════════════════════════
 async function getOrCreateFolder(){
+  if(!driveFolderId) driveFolderId = sessionStorage.getItem('fid_personal');
   if(driveFolderId)return driveFolderId;
   const r=await gapi.client.drive.files.list({q:`name='${DRIVE_FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,fields:'files(id)'});
   if(r.result.files.length>0){driveFolderId=r.result.files[0].id;return driveFolderId;}
@@ -619,6 +620,7 @@ async function loadFromDrive(){
     const r=await gapi.client.drive.files.list({q:`name='${DRIVE_FILE_NAME}' and '${fid}' in parents and trashed=false`,fields:'files(id)'});
     if(r.result.files.length>0){
       driveFileId=r.result.files[0].id;
+      sessionStorage.setItem('fileid_personal', driveFileId);
       const res=await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,{headers:{Authorization:`Bearer ${accessToken}`}});
       data=await res.json();
       if(!data.tasks)data.tasks=[]; if(!data.personas)data.personas=[]; if(!data.grupoOrder)data.grupoOrder=[]; if(!data.sgrupoOrder)data.sgrupoOrder={};
@@ -657,6 +659,9 @@ function loadLocal(){
 }
 
 async function saveToDrive(){
+  // Recuperar IDs de sessionStorage si no están en memoria
+  if(!driveFolderId) driveFolderId = sessionStorage.getItem('fid_personal');
+  if(!driveFileId) driveFileId = sessionStorage.getItem('fileid_personal');
   // Siempre guardar localmente primero como respaldo
   saveLocal();
   setSyncStatus('syncing','Guardando...');
@@ -670,6 +675,7 @@ async function saveToDrive(){
       form.append('file',new Blob([json],{type:'application/json'}));
       const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:`Bearer ${accessToken}`},body:form});
       driveFileId=(await r.json()).id;
+      sessionStorage.setItem('fileid_personal', driveFileId);
     }
     setSyncStatus('ok','Guardado ✓'); setTimeout(()=>setSyncStatus('ok','Sincronizado'),2000);
   }catch(e){
