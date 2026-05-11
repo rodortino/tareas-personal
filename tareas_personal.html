@@ -66,8 +66,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .search-bar{padding:10px 20px 6px;flex-shrink:0;background:var(--bg)}
   .groups-wrap{padding:0 20px 60px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
   /* Global col header for desktop */
-  .global-col-hdr{display:grid;grid-template-columns:28px 1fr 100px 110px 78px 92px 92px;gap:0;padding:6px 12px 6px 46px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border);margin:0 -20px}
-  .trow{display:grid;grid-template-columns:28px 1fr 100px 110px 78px 92px 92px;gap:0;padding:5px 12px 5px 26px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
+  .global-col-hdr{display:grid;grid-template-columns:28px 24px 1fr 100px 110px 78px 92px 92px;gap:0;padding:6px 12px 6px 46px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border);margin:0 -20px}
+  .trow{display:grid;grid-template-columns:28px 24px 1fr 100px 110px 78px 92px 92px;gap:0;padding:5px 12px 5px 26px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
   .trow:hover{background:#FAFAF8}
 }
 @media(max-width:768px){
@@ -80,8 +80,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .action-bar-wrap{position:sticky;top:0;z-index:50;flex-shrink:0}
   .search-bar{padding:8px 14px 4px;flex-shrink:0;background:var(--bg)}
   .groups-wrap{padding:0 14px 80px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
-  .global-col-hdr{display:grid;grid-template-columns:26px 1fr auto;gap:0;padding:6px 12px 6px 22px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border)}
-  .trow{display:grid;grid-template-columns:26px 1fr auto;gap:0;padding:9px 12px 9px 22px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
+  .global-col-hdr{display:grid;grid-template-columns:26px 24px 1fr auto;gap:0;padding:6px 12px 6px 22px;background:#EAE6DF;border-bottom:2px solid var(--border);border-top:1px solid var(--border)}
+  .trow{display:grid;grid-template-columns:26px 24px 1fr auto;gap:0;padding:9px 12px 9px 22px;border-bottom:1px solid #F5F3EE;align-items:center;cursor:pointer;transition:background .1s;position:relative}
   .trow:active{background:#FAFAF8}
   .mob-filter-toggle{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-bottom:1px solid var(--border);padding:11px 14px;cursor:pointer;min-height:var(--touch);flex-shrink:0}
   .mob-filter-panel{background:var(--surface);border-bottom:2px solid var(--accent);display:none;flex-shrink:0;overflow-y:auto;max-height:75vh}
@@ -278,7 +278,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <div class="app" id="app">
   <div class="hdr">
-    <div class="hdr-left"><h1>Tareas Personal <span style="font-size:10px;font-weight:400;opacity:.6">v2.7</span></h1><p id="hdr-date"></p></div>
+    <div class="hdr-left"><h1>Tareas Personal <span style="font-size:10px;font-weight:400;opacity:.6">v2.9</span></h1><p id="hdr-date"></p></div>
     <div class="hdr-right">
       <button class="hbtn desk-only" onclick="loadFromDrive()" title="Sincronizar" style="font-size:14px">🔄</button>
       <button class="hbtn desk-only" onclick="exportarJSON()" title="Descargar respaldo">↓ Respaldo</button>
@@ -803,8 +803,8 @@ function renderGroups(){
 
   // Header global de columnas — sticky arriba dentro del scroll
   const colHdrHtml = list.length===0 ? '' : isMob
-    ? `<div class="global-col-hdr" style="position:sticky;top:0;z-index:5"><span></span><span></span><span>Título / Detalle</span><div style="display:flex;justify-content:flex-end"><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text2);text-transform:uppercase">Inicio</span><span style="min-width:8px"></span><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text2);text-transform:uppercase">Límite</span></div></div>`
-    : `<div class="global-col-hdr" style="position:sticky;top:0;z-index:5;margin:0 -20px;padding:6px 12px 6px 46px"><span></span><span>Título</span><span>Responsable</span><span>Estado</span><span>Prioridad</span><span>F. inicio</span><span>F. límite</span></div>`;
+    ? `<div class="global-col-hdr" style="position:sticky;top:0;z-index:5"><span></span><span></span><span></span><span>Título / Detalle</span><div style="display:flex;justify-content:flex-end"><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text2);text-transform:uppercase">Inicio</span><span style="min-width:8px"></span><span style="min-width:44px;text-align:center;font-size:9px;font-weight:700;color:var(--text2);text-transform:uppercase">Límite</span></div></div>`
+    : `<div class="global-col-hdr" style="position:sticky;top:0;z-index:5;margin:0 -20px;padding:6px 12px 6px 46px"><span></span><span></span><span>Título</span><span>Responsable</span><span>Estado</span><span>Prioridad</span><span>F. inicio</span><span>F. límite</span></div>`;
 
   if(Object.keys(gm).length===0){
     wrap.innerHTML=`${colHdrHtml}<div style="text-align:center;padding:48px 20px;color:var(--text3);font-size:14px">Sin tareas que coincidan con los filtros</div><div class="add-grupo" onclick="addGrupo()"><span style="font-size:18px">+</span> Nuevo grupo</div>`;
@@ -842,7 +842,7 @@ function renderGroups(){
       else sgHtml+=`<div class="subgrupo" style="border-top:${gName?'1px solid var(--border)':'none'}"><div class="sgrp-body"><div>${rows}</div></div></div>`;
     });
     if(!sgHtml)return;
-    if(gName) html+=`<div class="grupo"><div class="grp-hdr" onclick="toggleGrp(this)"><span class="sgrp-btns" style="flex-direction:row;gap:2px"><button class="sgrp-move-btn" onclick="event.stopPropagation();moveGrupo('${esc(gName)}',-1)" title="Subir">▲</button><button class="sgrp-move-btn" onclick="event.stopPropagation();moveGrupo('${esc(gName)}',1)" title="Bajar">▼</button></span><span class="grp-arrow">▾</span><span style="font-size:15px">📁</span><span class="grp-name">${esc(gName)}</span><span class="grp-cnt">${total}</span><span class="grp-add desk-only" onclick="event.stopPropagation();addSubgrupo('${esc(gName)}')">+ Subgrupo</span></div><div class="grp-body">${sgHtml}</div></div>`;
+    if(gName) html+=`<div class="grupo"><div class="grp-hdr" onclick="toggleGrp(this)"><span class="sgrp-btns"><button class="sgrp-move-btn" onclick="event.stopPropagation();moveGrupo('${esc(gName)}',-1)" title="Subir">▲</button><button class="sgrp-move-btn" onclick="event.stopPropagation();moveGrupo('${esc(gName)}',1)" title="Bajar">▼</button></span><span class="grp-arrow">▾</span><span style="font-size:15px">📁</span><span class="grp-name">${esc(gName)}</span><span class="grp-cnt">${total}</span><span class="grp-add desk-only" onclick="event.stopPropagation();addSubgrupo('${esc(gName)}')">+ Subgrupo</span></div><div class="grp-body">${sgHtml}</div></div>`;
     else html+=`<div class="grupo" style="border-style:dashed"><div class="grp-hdr" onclick="toggleGrp(this)" style="background:transparent"><span class="grp-arrow">▾</span><span style="font-size:15px">📄</span><span class="grp-name" style="color:var(--text3);font-style:italic">Sin grupo</span><span class="grp-cnt">${total}</span></div><div class="grp-body">${sgHtml}</div></div>`;
   });
   html+=`<div class="add-grupo" onclick="addGrupo()"><span style="font-size:18px">+</span> Nuevo grupo</div>`;
